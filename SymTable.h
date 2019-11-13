@@ -2,6 +2,7 @@
 #include "defs.h"
 #include "Type.h"
 #include "Sym.h"
+#include <string.h>
 
 struct _SymTable_ {
 	ListHead head;

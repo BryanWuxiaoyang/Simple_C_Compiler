@@ -60,7 +60,7 @@ typedef struct _Node_* Node;
 #define TEST_MODE
 
 #ifdef TEST_MODE
-int indent = 0;
+int indent = -1;
 
 const char* getSym(int code) {
 	switch (code) {
@@ -90,10 +90,10 @@ const char* getSym(int code) {
 	}
 }
 void testEnterPrint(Node node) {
+	indent++;
 	for (int i = 0; i < indent; i++)
 		printf("\t");
 	printf("enter %s line %d expandNo %d\n", getSym(node->symCode), node->lineno, node->expandNo);
-	indent++;
 }
 void testExitPrint(Node node) {
 	for (int i = 0; i < indent; i++)
@@ -127,10 +127,14 @@ Node getSyntaxTreeFromFile(FILE* file) {
 	int t;
 	switch (node->symCode) {
 	case SYN_ID: node->str_val = (char*)malloc(sizeof(char) * 50); fscanf(file, "%s", node->str_val); break;
-	case SYN_RELOP: fscanf(file, "%d", &t); node->op = t; break;
+	case SYN_RELOP: fscanf(file, "%d", &t); node->op = (OP)t; break;
 	case SYN_INT: fscanf(file, "%d", &node->int_val); break;
 	case SYN_FLOAT: fscanf(file, "%f", &node->float_val); break;
 	}
+	for (int i = 0; i < node->childNum; i++) {
+		node->child[i] = getSyntaxTreeFromFile(file);
+	}
+	return node;
 }
 
 void printTables() {
@@ -192,7 +196,7 @@ void SM_Program(Node node) {
 	testEnterPrint(node);
 #endif
 	if (node->expandNo == 1) {// ExtDefList
-		SM_ExtDefList(node);
+		SM_ExtDefList(node->child[0]);
 	}
 #ifdef TEST_MODE
 	testExitPrint(node);
@@ -204,8 +208,8 @@ void SM_ExtDefList(Node node) {
 	testEnterPrint(node);
 #endif
 	if (node->expandNo == 1) {// ExtDef ExtDefList
-		SM_ExtDef(node);
-		SM_ExtDefList(node);
+		SM_ExtDef(node->child[0]);
+		SM_ExtDefList(node->child[1]);
 	}
 	else if (node->expandNo == 2) {// none
 		
