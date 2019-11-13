@@ -271,12 +271,14 @@ int isInstantASTNode(ASTNode node, BasicType* ret_type, void** ret_value) {
 	if (node->nodeType == AST_INTEGER) {
 		if (ret_type)* ret_type = BASIC_INTEGER;
 		if (ret_value)* ret_value = node->nodeValue.integer;
+		return 1;
 	}
 	else if (node->nodeType == AST_FLOAT) {
 		if (ret_type)* ret_type = BASIC_FLOAT;
 		if (ret_value)* ret_value = node->nodeValue.float_;
+		return 1;
 	}
-	else if(node->nodeType == AST_SYM && node->nodeValue.sym->instantValue) {
+	else if(node->nodeType == AST_SYM && node->nodeValue.sym->type->kind == BASIC) {
 		Sym sym = node->nodeValue.sym;
 		if (sym->type == integerType) {
 			if(ret_type)*ret_type = BASIC_INTEGER;
@@ -286,6 +288,7 @@ int isInstantASTNode(ASTNode node, BasicType* ret_type, void** ret_value) {
 			if(ret_type)*ret_type = BASIC_FLOAT;
 			if (ret_value)* ret_value = sym->instantValue;
 		}
+		return 1;
 	}
 	else return 0;
 }

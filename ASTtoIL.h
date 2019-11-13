@@ -2,21 +2,39 @@
 #include "AbstractSyntaxTree.h"
 #include "IntermediateLanguage.h"
 
-int tryGenInstantNode(ASTNode node) {
+int tryGenInstantNode(ASTNode node, OP op) {
 	BasicType type1 = BASIC_ERROR, type2 = BASIC_ERROR;
 	void* value1 = NULL;
 	void* value2 = NULL;
 	if (isInstantASTNode(node->lc, &type1, &value1) && isInstantASTNode(node->rc, &type2, &value2)) {
 		switch (type1) {
 		case BASIC_INTEGER: {
-			Integer value = createInteger(((Integer)value1)->value + ((Integer)value2)->value);
+			int v1 = ((Integer)value1)->value;
+			int v2 = ((Integer)value2)->value;
+			Integer value = NULL;
+			switch (op) {
+			case OP_PLUS:	value = createInteger(v1 + v2); break;
+			case OP_MINUS:	value = createInteger(v1 - v2); break;
+			case OP_STAR:	value = createInteger(v1 * v2); break;
+			case OP_DIV:	value = createInteger(v1 / v2); break;
+			default:		value = createInteger(v1);
+			}
 			node->nodeType = AST_INTEGER;
 			node->nodeValue.integer = value;
 			node->name = NULL;
 			break;
 		}
 		case BASIC_FLOAT: {
-			Float value = createFloat(((Float)value1)->value + ((Float)value2)->value);
+			float v1 = ((Float)value1)->value;
+			float v2 = ((Float)value2)->value;
+			Float value = NULL;
+			switch (op) {
+			case OP_PLUS:	value = createFloat(v1 + v2); break;
+			case OP_MINUS:	value = createFloat(v1 - v2); break;
+			case OP_STAR:	value = createFloat(v1 * v2); break;
+			case OP_DIV:	value = createFloat(v1 / v2); break;
+			default:		value = createFloat(v1);
+			}
 			node->nodeType = AST_FLOAT;
 			node->nodeValue.float_ = value;
 			node->name = NULL;
@@ -59,7 +77,7 @@ void ASTtoIL(ASTNode node) {
 					break;
 				}
 			}
-			tryGenInstantNode(node);
+			tryGenInstantNode(node, op);
 			appendInterCode(createInterCode(arg1, arg2, target, ilop));
 			break;
 		}
@@ -73,25 +91,25 @@ void ASTtoIL(ASTNode node) {
 		case OP_LE:exit(-1); break;
 		case OP_PLUS:{
 			ilop = ILOP_PLUS;
-			if(tryGenInstantNode(node) == 0)
+			if(tryGenInstantNode(node, op) == 0)
 				appendInterCode(createInterCode(arg1, arg2, target, ilop));
 			break;
 		}
 		case OP_MINUS: {
 			ilop = ILOP_MINUS; 
-			if (tryGenInstantNode(node) == 0)
+			if (tryGenInstantNode(node, op) == 0)
 				appendInterCode(createInterCode(arg1, arg2, target, ilop));
 			break;
 		}
 		case OP_STAR: {
 			ilop = ILOP_MUL; 
-			if (tryGenInstantNode(node) == 0)
+			if (tryGenInstantNode(node, op) == 0)
 				appendInterCode(createInterCode(arg1, arg2, target, ilop));
 			break;
 		}
 		case OP_DIV: {
 			ilop = ILOP_DIV;
-			if (tryGenInstantNode(node) == 0)
+			if (tryGenInstantNode(node, op) == 0)
 				appendInterCode(createInterCode(arg1, arg2, target, ilop));
 			break;
 		}
