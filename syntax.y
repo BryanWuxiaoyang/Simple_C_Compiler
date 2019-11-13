@@ -4,7 +4,7 @@
     #include "lex.yy.c"
     #include "SemanticProcess.h"
     void yyerror(char* msg);
-    struct Node* nodeBuffer[8];
+    Node nodeBuffer[8];
     void errorTypeB(int lineno,int errorId){
         ok=0;
         if(lex_err == lineno){
@@ -28,7 +28,7 @@
     }
 %}
 
-%define api.value.type {struct Node*}
+%define api.value.type {Node}
 %locations
 
 %token INT FLOAT ID SEMI COMMA ASSIGNOP RELOP PLUS MINUS STAR DIV AND OR DOT NOT TYPE_INT TYPE_FLOAT LP RP LB RB LC RC STRUCT RETURN IF ELSE WHILE NEG ERROR
@@ -393,7 +393,10 @@ int main(int argc,char** argv){
     if(ok){
         //printTree(nodeBuffer[0],0);
         printf("Syntax OK!\n");
-        semAnalysis(nodeBuffer[0]);
+        //semAnalysis(nodeBuffer[0]);
+		FILE* file = fopen("tree.txt", "w");
+		putSyntaxTreeToFile(file, nodeBuffer[0]);
+		fclose(file);
     }
     return 0;
 }
