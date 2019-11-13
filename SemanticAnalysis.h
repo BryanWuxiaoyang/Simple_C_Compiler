@@ -163,6 +163,7 @@ void init() {
 	initFuncTable();
 	initTypeTable();
 	initAST();
+	initIL();
 }
 
 void SM_Program(Node node);

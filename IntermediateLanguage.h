@@ -53,7 +53,11 @@ InterCode createInterCode(char* arg1, char* arg2, char* target, ILOP op) {
 	return code;
 }
 
-ListHead interCodeList = MyList_createList();
+ListHead interCodeList;
+
+void initIL(){
+	interCodeList = MyList_createList();
+}
 
 void appendInterCode(InterCode code) {
 	MyList_pushElem(interCodeList, code);
