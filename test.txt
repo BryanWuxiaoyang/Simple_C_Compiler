@@ -1,0 +1,41 @@
+struct Node{
+ int no;
+ int name[5];
+ float value;
+ int nextno;
+ };
+ struct Node initial_Node(struct Node temp1);
+
+int add_Node(struct Node former, struct Node later, int m);
+int delete_Node(struct Node temp);
+int main(){
+ struct Node a, b;
+ initial_Node(a);
+ initial_Node(b);
+ delete_Node(a);
+ return add_Node(a,b);
+
+ }
+ int add_Node(struct Node former, struct Node later){
+ if(former.nextno!=-1 && later.nextno == -1){
+ later.nextno = former.nextno;
+ former.nextno = later.no;
+ return 0;
+ }
+ else if(former.nextno == -1 && later.nextno != -1){
+ former.nextno = later.no;
+ return 1;
+ }
+ return -1;
+}
+int initial_Node(struct Node temp1){
+int i = 0;
+while(i<5){
+ temp1.name[i] = i;
+ i = i + 1;
+ }
+ temp1.value = 0.0;
+ temp1.no = temp1.nextno = -1;
+ return 1;
+
+}
