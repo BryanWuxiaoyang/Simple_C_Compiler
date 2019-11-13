@@ -151,7 +151,7 @@ void printTypeTable() {
 	ListIterator it = MyList_createIterator(typeTableList);
 	while (MyList_hasNext(it)) {
 		TypeTable table = (TypeTable)MyList_getNext(it);
-		printf("\typetable: ");
+		printf("\ttypetable: ");
 		switch (table->type) {
 		case FIELD_GLOBAL: printf("global"); break;
 		case FIELD_STRUCT: printf("struct"); break;

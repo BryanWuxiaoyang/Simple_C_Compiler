@@ -272,17 +272,22 @@ char* getASTNodeStr(ASTNode node) {
 	return str;
 }
 
-int astIndent = 0;
+int astIndent = -1;
 void printASTTree(ASTNode node) {
+	if (node == NULL) return;
+	astIndent++;
 	for (int i = 0; i < astIndent; i++)
 		printf("\t");
 	switch (node->nodeType) {
 	case AST_INTEGER:	printf("integer: %s", itostr(node->nodeValue.integer->value)); break;
 	case AST_FLOAT:		printf("float: %s", ftostr(node->nodeValue.float_->value)); break;
 	case AST_SYM:		printf("symbal: %s --> var: %s", node->nodeValue.sym->name, node->name); break;
-	case AST_FUNC:		printf("func: %s, return var: %s", node->nodeValue.func->name, node->name); break;
-	case AST_OP:		printf("op: %d, var: %s", node->nodeValue.op, node->name); break;
+	case AST_FUNC:		printf("func: %s --> return var: %s", node->nodeValue.func->name, node->name); break;
+	case AST_OP:		printf("op: %d --> var: %s", node->nodeValue.op, node->name); break;
 	default:			printf("error!"); exit(-1);
 	}
 	printf("\n");
+	printASTTree(node->lc);
+	printASTTree(node->rc);
+	astIndent--;
 }

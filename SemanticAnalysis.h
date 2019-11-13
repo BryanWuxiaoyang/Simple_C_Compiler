@@ -35,7 +35,7 @@ enum {
 	Exp,
 	Args,
 	SYN_ID,
-	SYN_RELOP,
+	SYN_OP,
 	SYN_INT,
 	SYN_FLOAT
 };
@@ -110,7 +110,7 @@ void putSyntaxTreeToFile(FILE* file, Node node) {
 	fprintf(file, "%d %d %d %d", code, no, lineno, node->childNum);
 	switch (node->symCode) {
 	case SYN_ID: fprintf(file, " %s", node->str_val); break;
-	case SYN_RELOP: fprintf(file, " %d", node->op); break;
+	case SYN_OP: fprintf(file, " %d", node->op); break;
 	case SYN_INT: fprintf(file, " %d", node->int_val); break;
 	case SYN_FLOAT: fprintf(file, " %f", node->float_val); break;
 	}
@@ -127,7 +127,7 @@ Node getSyntaxTreeFromFile(FILE* file) {
 	int t;
 	switch (node->symCode) {
 	case SYN_ID: node->str_val = (char*)malloc(sizeof(char) * 50); fscanf(file, "%s", node->str_val); break;
-	case SYN_RELOP: fscanf(file, "%d", &t); node->op = (OP)t; break;
+	case SYN_OP: fscanf(file, "%d", &t); node->op = (OP)t; break;
 	case SYN_INT: fscanf(file, "%d", &node->int_val); break;
 	case SYN_FLOAT: fscanf(file, "%f", &node->float_val); break;
 	}
@@ -283,10 +283,10 @@ void SM_Specifier(Node node, Type* ret_specType) {
 	testEnterPrint(node);
 #endif
 	if (node->expandNo == 1) {// TYPE_FLOAT
-		*ret_specType = integerType;
+		*ret_specType = floatType;
 	}
 	else if (node->expandNo == 2) {// TYPE_INT
-		if(ret_specType) *ret_specType = floatType;
+		if(ret_specType) *ret_specType = integerType;
 	}
 	else if (node->expandNo == 3) {// StructSpecifier
 		Node structSpecifierNode = node->child[0];
@@ -501,7 +501,9 @@ void SM_Stmt(Node node, Type returnType) {
 #endif
 	if (node->expandNo == 1) {// Exp SEMI
 		Node expNode = node->child[0];
-		SM_Exp(expNode, NULL);
+		ASTNode astNode = NULL;
+		SM_Exp(expNode, &astNode);
+		printASTTree(astNode);
 	}
 	else if (node->expandNo == 2) {// CompSt
 		Node compStNode = node->child[0];

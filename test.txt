@@ -1,8 +1,1 @@
-int main(){
-    int a = 1;
-    float b = 2;
-    int c = 3;
-    a = c + 1;
-    if(a > c) a = 2;
-    return 0;
-}
+int a;

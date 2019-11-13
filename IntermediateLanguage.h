@@ -6,6 +6,7 @@
 #include <string.h>
 
 enum ILOP {
+	ILOP_NONE,
 	ILOP_LABEL,
 	ILOP_FUNCTION,
 	ILOP_ASSIGN,
@@ -31,6 +32,7 @@ enum ILOP {
 	ILOP_READ,
 	ILOP_WRITE
 };
+typedef enum ILOP ILOP;
 
 struct _InterCode_ {
 	char* arg1;
