@@ -24,7 +24,7 @@ char* createName_func() {
 char* createName_temp() {
 	tempVarCnt++;
 	char* name = (char*)malloc(sizeof(char) * 10);
-	if (name) sprintf(name, "v%d", tempVarCnt);
+	if (name) sprintf(name, "t%d", tempVarCnt);
 	return name;
 }
 

@@ -138,9 +138,9 @@ void initTypeTable() {
 	curTypeTable = globalTypeTable;
 	MyList_pushElem(typeTableList, globalTypeTable);
 
-	integerType = createType_basic("integer", 1);
-	floatType = createType_basic("float", 2);
-	errorType = createType_basic("erorr", 3);
+	integerType = createType_basic("integer", BASIC_INTEGER);
+	floatType = createType_basic("float", BASIC_FLOAT);
+	errorType = createType_basic("erorr", BASIC_ERROR);
 	insertType(getCurTypeTable(), integerType);
 	insertType(getCurTypeTable(), floatType);
 	insertType(getCurTypeTable(), errorType);

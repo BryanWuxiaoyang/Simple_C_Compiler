@@ -6,6 +6,7 @@
 #include "SemanticErrorChecks.h"
 #include "AbstractSyntaxTree.h"
 #include "OP.h"
+#include "ASTtoIL.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -503,7 +504,9 @@ void SM_Stmt(Node node, Type returnType) {
 		Node expNode = node->child[0];
 		ASTNode astNode = NULL;
 		SM_Exp(expNode, &astNode);
+		ASTtoIL(astNode);
 		printASTTree(astNode);
+		printf("\n\n");
 	}
 	else if (node->expandNo == 2) {// CompSt
 		Node compStNode = node->child[0];

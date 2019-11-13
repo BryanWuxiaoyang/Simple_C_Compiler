@@ -51,6 +51,7 @@ Sym createSym(const char* name, Type type) {
 		if(sym->name) strcpy(sym->name, name);
 		sym->type = type;
 		sym->offset = 0;
+		sym->instantValue = NULL;
 	}
 	return sym;
 }

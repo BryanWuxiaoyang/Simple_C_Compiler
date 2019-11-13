@@ -2,12 +2,37 @@
 #include "AbstractSyntaxTree.h"
 #include "IntermediateLanguage.h"
 
+int tryGenInstantNode(ASTNode node) {
+	BasicType type1 = BASIC_ERROR, type2 = BASIC_ERROR;
+	void* value1 = NULL;
+	void* value2 = NULL;
+	if (isInstantASTNode(node->lc, &type1, &value1) && isInstantASTNode(node->rc, &type2, &value2)) {
+		switch (type1) {
+		case BASIC_INTEGER: {
+			Integer value = createInteger(((Integer)value1)->value + ((Integer)value2)->value);
+			node->nodeType = AST_INTEGER;
+			node->nodeValue.integer = value;
+			node->name = NULL;
+			break;
+		}
+		case BASIC_FLOAT: {
+			Float value = createFloat(((Float)value1)->value + ((Float)value2)->value);
+			node->nodeType = AST_FLOAT;
+			node->nodeValue.float_ = value;
+			node->name = NULL;
+			break;
+		}
+		}
+		return 1;
+	}
+	return 0;
+}
 
 void ASTtoIL(ASTNode node) {
-	if (node == NULL) {
-		exit(-1);
-	}
-	else if (node->nodeType == AST_OP) {
+	if (node == NULL) exit(-1);
+	if (node->accessTag > 0) return;
+	node->accessTag++;
+	if (node->nodeType == AST_OP) {
 		ASTtoIL(node->lc);
 		ASTtoIL(node->rc);
 		char* arg1 = node->lc ? getASTNodeStr(node->lc) : NULL;
@@ -16,7 +41,28 @@ void ASTtoIL(ASTNode node) {
 		OP op = node->nodeValue.op;
 		ILOP ilop = ILOP_NONE;
 		switch (op) {
-		case OP_ASSIGN: ilop = ILOP_ASSIGN; break;
+		case OP_ASSIGN: {
+			ilop = ILOP_ASSIGN; 
+			target = arg1; 
+			arg1 = arg2;
+			arg2 = NULL;
+			BasicType type = BASIC_ERROR;
+			void* value = NULL;
+			if (node->lc->nodeType == AST_SYM && isInstantASTNode(node->rc, &type, &value)) {
+				Sym sym = node->lc->nodeValue.sym;
+				switch (type) {
+				case BASIC_INTEGER:
+					sym->instantValue = createInteger(((Integer)value)->value);
+					break;
+				case BASIC_FLOAT:
+					sym->instantValue = createFloat(((Float)value)->value);
+					break;
+				}
+			}
+			tryGenInstantNode(node);
+			appendInterCode(createInterCode(arg1, arg2, target, ilop));
+			break;
+		}
 		case OP_AND: exit(-1); break;
 		case OP_OR: exit(-1); break;
 		case OP_G:exit(-1); break;
@@ -25,13 +71,39 @@ void ASTtoIL(ASTNode node) {
 		case OP_NE:exit(-1); break;
 		case OP_L:exit(-1); break;
 		case OP_LE:exit(-1); break;
-		case OP_PLUS:ilop = ILOP_PLUS; break;
-		case OP_MINUS:ilop = ILOP_MINUS; break;
-		case OP_STAR:ilop = ILOP_MUL; break;
-		case OP_DIV:ilop = ILOP_DIV; break;
-		case OP_NEG:exit(-1); break;
-		case OP_NOT:exit(-1); break;
+		case OP_PLUS:{
+			ilop = ILOP_PLUS;
+			if(tryGenInstantNode(node) == 0)
+				appendInterCode(createInterCode(arg1, arg2, target, ilop));
+			break;
 		}
-		appendInterCode(createInterCode(arg1, arg2, target, ilop));
+		case OP_MINUS: {
+			ilop = ILOP_MINUS; 
+			if (tryGenInstantNode(node) == 0)
+				appendInterCode(createInterCode(arg1, arg2, target, ilop));
+			break;
+		}
+		case OP_STAR: {
+			ilop = ILOP_MUL; 
+			if (tryGenInstantNode(node) == 0)
+				appendInterCode(createInterCode(arg1, arg2, target, ilop));
+			break;
+		}
+		case OP_DIV: {
+			ilop = ILOP_DIV;
+			if (tryGenInstantNode(node) == 0)
+				appendInterCode(createInterCode(arg1, arg2, target, ilop));
+			break;
+		}
+		case OP_NEG: {
+			exit(-1); 
+			break;
+		}
+		case OP_NOT: {
+			exit(-1); 
+			break;
+		}
+		}
+		
 	}
 }

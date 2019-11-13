@@ -32,19 +32,26 @@ typedef union ASTNodeValue ASTNodeValue;
 
 struct _ASTNode_ {
 	int height;
+
 	enum ASTNodeType nodeType;
 	union ASTNodeValue nodeValue;
 	char* name;
+
 	struct _ASTNode_* lc;
 	struct _ASTNode_* rc;
 	ListHead parents;
+
+	int accessTag;
 };
 typedef struct _ASTNode_* ASTNode;
 
 ListHead astNodeLists[AST_MAX_HEIGHT + 1];
 
-int maxHeight(int h1, int h2) {
-	return h1 > h2 ? h1 : h2;
+int maxHeight(ASTNode h1, ASTNode h2) {
+	if (h1 && h2) return h1->height > h2->height ? h1->height : h2->height;
+	else if (h1) return h1->height;
+	else if (h2) return h2->height;
+	else return 0;
 }
 
 ListHead getASTNodeList(int height) {
@@ -57,12 +64,7 @@ void initAST() {
 	}
 }
 
-ASTNode findASTNode(ASTNodeType type, ASTNodeValue value, ASTNode lc, ASTNode rc) {
-	int height = 0;
-	if (lc && rc) height = maxHeight(lc->height, rc->height);
-	else if (lc) height = lc->height;
-	else if (rc) height = rc->height;
-	else height = 0;
+ASTNode findASTNode(int height, ASTNodeType type, ASTNodeValue value, ASTNode lc, ASTNode rc) {
 	ListHead list = getASTNodeList(height);
 	ListIterator it = MyList_createIterator(list);
 	ASTNode res = NULL;
@@ -112,6 +114,7 @@ ASTNode createASTNode_raw(int height, ASTNodeType nodeType, ASTNodeValue nodeVal
 		node->lc = lc;
 		node->rc = rc;
 		node->parents = parents;
+		node->accessTag = 0;
 	}
 	return node;
 }
@@ -120,11 +123,8 @@ ASTNode createASTNode_sym(Sym sym) {
 	ASTNode node = NULL;
 	ASTNodeValue value;
 	value.sym = sym;
-	node = findASTNode(AST_SYM, value, NULL, NULL);
-	if (node) {
-
-	}
-	else {
+	node = findASTNode(0, AST_SYM, value, NULL, NULL);
+	if(node == NULL){
 		node = createASTNode_raw(
 			0,
 			AST_SYM,
@@ -134,6 +134,7 @@ ASTNode createASTNode_sym(Sym sym) {
 			NULL,
 			MyList_createList()
 		);
+		insertASTNode(node);
 	}
 	return node;
 }
@@ -142,11 +143,8 @@ ASTNode createASTNode_func(Func func) {
 	ASTNode node = NULL;
 	ASTNodeValue value;
 	value.func = func;
-	node = findASTNode(AST_FUNC, value, NULL, NULL);
-	if (node) {
-
-	}
-	else {
+	node = findASTNode(0, AST_FUNC, value, NULL, NULL);
+	if (node == NULL){
 		node = createASTNode_raw(
 			0,
 			AST_FUNC,
@@ -156,6 +154,7 @@ ASTNode createASTNode_func(Func func) {
 			NULL,
 			MyList_createList()
 		);
+		insertASTNode(node);
 	}
 	return node;
 }
@@ -164,11 +163,8 @@ ASTNode createASTNode_integer(int v) {
 	ASTNode node = NULL;
 	ASTNodeValue value;
 	value.integer = createInteger(v);
-	node = findASTNode(AST_INTEGER, value, NULL, NULL);
-	if (node) {
-
-	}
-	else {
+	node = findASTNode(0, AST_INTEGER, value, NULL, NULL);
+	if (node == NULL){
 		node = createASTNode_raw(
 			0,
 			AST_INTEGER,
@@ -178,6 +174,7 @@ ASTNode createASTNode_integer(int v) {
 			NULL,
 			MyList_createList()
 		);
+		insertASTNode(node);
 	}
 	return node;
 }
@@ -186,11 +183,8 @@ ASTNode createASTNode_float(float v) {
 	ASTNode node = NULL;
 	ASTNodeValue value;
 	value.float_ = createFloat(v);
-	node = findASTNode(AST_FLOAT, value, NULL, NULL);
-	if (node) {
-
-	}
-	else {
+	node = findASTNode(0, AST_FLOAT, value, NULL, NULL);
+	if (node == NULL){
 		node = createASTNode_raw(
 			0,
 			AST_FLOAT,
@@ -200,6 +194,7 @@ ASTNode createASTNode_float(float v) {
 			NULL,
 			MyList_createList()
 		);
+		insertASTNode(node);
 	}
 	return node;
 }
@@ -234,10 +229,10 @@ ASTNode createASTNode_op(OP op, ASTNode lc, ASTNode rc) {
 	if (op == OP_ASSIGN) {
 		clearParents(lc);
 	}
-	node = findASTNode(AST_OP, value, lc, rc);
+	node = findASTNode(maxHeight(lc, rc) + 1, AST_OP, value, lc, rc);
 	if (node == NULL) {
 		node = createASTNode_raw(
-			1 + maxHeight(lc->height, rc->height),
+			maxHeight(lc, rc) + 1,
 			AST_OP,
 			value,
 			op == OP_ASSIGN ? lc->name : createName_temp(),
@@ -245,8 +240,8 @@ ASTNode createASTNode_op(OP op, ASTNode lc, ASTNode rc) {
 			rc,
 			MyList_createList()
 		);
-		MyList_pushElem(lc->parents, node);
-		MyList_pushElem(rc->parents, node);
+		if(lc) MyList_pushElem(lc->parents, node);
+		if(rc && rc != lc) MyList_pushElem(rc->parents, node);
 		insertASTNode(node);
 	}
 	return node;
@@ -271,6 +266,30 @@ char* getASTNodeStr(ASTNode node) {
 	else str = node->name;
 	return str;
 }
+
+int isInstantASTNode(ASTNode node, BasicType* ret_type, void** ret_value) {
+	if (node->nodeType == AST_INTEGER) {
+		if (ret_type)* ret_type = BASIC_INTEGER;
+		if (ret_value)* ret_value = node->nodeValue.integer;
+	}
+	else if (node->nodeType == AST_FLOAT) {
+		if (ret_type)* ret_type = BASIC_FLOAT;
+		if (ret_value)* ret_value = node->nodeValue.float_;
+	}
+	else if(node->nodeType == AST_SYM && node->nodeValue.sym->instantValue) {
+		Sym sym = node->nodeValue.sym;
+		if (sym->type == integerType) {
+			if(ret_type)*ret_type = BASIC_INTEGER;
+			if (ret_value)* ret_value = sym->instantValue;
+		}
+		else if (sym->type == floatType) {
+			if(ret_type)*ret_type = BASIC_FLOAT;
+			if (ret_value)* ret_value = sym->instantValue;
+		}
+	}
+	else return 0;
+}
+
 
 int astIndent = -1;
 void printASTTree(ASTNode node) {

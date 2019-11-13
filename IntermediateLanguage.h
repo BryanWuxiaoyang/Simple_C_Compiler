@@ -66,7 +66,7 @@ void printInterCode(InterCode code) {
 	switch (code->op) {
 	case	ILOP_LABEL:		printf("LABEL %s :", target); break;
 	case 	ILOP_FUNCTION:	printf("FUNCTION %s :", target); break;
-	case 	ILOP_ASSIGN:	printf("%s := %s\n", target, arg1); break;
+	case 	ILOP_ASSIGN:	printf("%s := %s", target, arg1); break;
 	case 	ILOP_PLUS:		printf("%s := %s + %s", target, arg1, arg2); break;
 	case 	ILOP_MINUS:		printf("%s := %s - %s", target, arg1, arg2); break;
 	case 	ILOP_MUL:		printf("%s := %s * %s", target, arg1, arg2); break;

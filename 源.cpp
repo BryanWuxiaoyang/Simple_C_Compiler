@@ -7,5 +7,6 @@ int main() {
 	semAnalysis(node);
 	fclose(file);
 	printTables();
+	printInterCodeList();
 	return 0;
 }
