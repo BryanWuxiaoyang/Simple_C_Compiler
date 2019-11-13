@@ -972,62 +972,62 @@ YY_RULE_SETUP
 case 16:
 YY_RULE_SETUP
 #line 122 "lexical.l"
-{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_G; last_unit=RELOP;                               return(RELOP);      }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_G; last_unit=RELOP;                               return(RELOP);      }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 123 "lexical.l"
-{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_GE; last_unit=RELOP;                                 return(RELOP);      }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_GE; last_unit=RELOP;                                 return(RELOP);      }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 124 "lexical.l"
-{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_L; last_unit=RELOP;                                      return(RELOP);      }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_L; last_unit=RELOP;                                      return(RELOP);      }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 125 "lexical.l"
-{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_LE; last_unit=RELOP;                                  return(RELOP);      }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_LE; last_unit=RELOP;                                  return(RELOP);      }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 126 "lexical.l"
-{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_E; last_unit=RELOP;                                   return(RELOP);      }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_E; last_unit=RELOP;                                   return(RELOP);      }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 127 "lexical.l"
-{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_NE; last_unit=RELOP;                                    return(RELOP);      }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_NE; last_unit=RELOP;                                    return(RELOP);      }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 128 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=PLUS;                                  return(PLUS);       }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_PLUS; last_unit=PLUS;                                  return(PLUS);       }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 129 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB)  {yylval->int_val=last_unit=MINUS;   return(MINUS);}   else{yylval->int_val=last_unit=NEG;  return(NEG); }     }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB)  {yylval->op = OP_MINUS; last_unit=MINUS;   return(MINUS);}   else{yylval->op = OP_NEG; last_unit=NEG;  return(NEG); }     }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 130 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=STAR;                                 return(STAR);       }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_STAR; last_unit=STAR;                                 return(STAR);       }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
 #line 131 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=DIV;                                    return(DIV);        }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_DIV; last_unit=DIV;                                    return(DIV);        }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
 #line 132 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=AND;                                        return(AND);        }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_AND; last_unit=AND;                                        return(AND);        }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
 #line 133 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=OR;                                         return(OR);         }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_OR; last_unit=OR;                                         return(OR);         }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
@@ -1037,7 +1037,7 @@ YY_RULE_SETUP
 case 29:
 YY_RULE_SETUP
 #line 135 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=NOT;                                         return(NOT);        }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_NOT; last_unit=NOT;                                         return(NOT);        }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP

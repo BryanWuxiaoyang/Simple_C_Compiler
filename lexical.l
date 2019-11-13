@@ -119,20 +119,20 @@ while   {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=W
 ";"     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=SEMI;                                      return(SEMI);       }
 ","     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=COMMA;                                     return(COMMA);      }
 "="     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=ASSIGNOP;                              return(ASSIGNOP);   }
-">"     {yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_G; last_unit=RELOP;                               return(RELOP);      }
-">="    {yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_GE; last_unit=RELOP;                                 return(RELOP);      }
-"<"     {yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_L; last_unit=RELOP;                                      return(RELOP);      }
-"<="    {yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_LE; last_unit=RELOP;                                  return(RELOP);      }
-"=="    {yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_E; last_unit=RELOP;                                   return(RELOP);      }
-"!="    {yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_NE; last_unit=RELOP;                                    return(RELOP);      }
-"+"     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=PLUS;                                  return(PLUS);       }
-"-"     {yylval=createNode(0,NULL,0,Other,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB)  {yylval->int_val=last_unit=MINUS;   return(MINUS);}   else{yylval->int_val=last_unit=NEG;  return(NEG); }     }
-"*"     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=STAR;                                 return(STAR);       }
-"/"     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=DIV;                                    return(DIV);        }
-"&&"    {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=AND;                                        return(AND);        }
-"||"    {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=OR;                                         return(OR);         }
+">"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_G; last_unit=RELOP;                               return(RELOP);      }
+">="    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_GE; last_unit=RELOP;                                 return(RELOP);      }
+"<"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_L; last_unit=RELOP;                                      return(RELOP);      }
+"<="    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_LE; last_unit=RELOP;                                  return(RELOP);      }
+"=="    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_E; last_unit=RELOP;                                   return(RELOP);      }
+"!="    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_NE; last_unit=RELOP;                                    return(RELOP);      }
+"+"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_PLUS; last_unit=PLUS;                                  return(PLUS);       }
+"-"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB)  {yylval->op = OP_MINUS; last_unit=MINUS;   return(MINUS);}   else{yylval->op = OP_NEG; last_unit=NEG;  return(NEG); }     }
+"*"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_STAR; last_unit=STAR;                                 return(STAR);       }
+"/"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_DIV; last_unit=DIV;                                    return(DIV);        }
+"&&"    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_AND; last_unit=AND;                                        return(AND);        }
+"||"    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_OR; last_unit=OR;                                         return(OR);         }
 "."     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=DOT;                                       return(DOT);        }
-"!"     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=NOT;                                         return(NOT);        }
+"!"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_NOT; last_unit=NOT;                                         return(NOT);        }
 "("     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=LP;                                         return(LP);         }
 ")"     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RP;                                           return(RP);         }
 "["     {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=LB;                                      return(LB);         }
