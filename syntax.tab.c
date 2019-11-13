@@ -71,9 +71,9 @@
     #include <stdio.h>
     #include <string.h>
     #include "lex.yy.c"
-    #include "SemanticProcess.h"
+    #include "SemanticAnalysis.h"
     void yyerror(char* msg);
-    struct Node* nodeBuffer[8];
+    Node nodeBuffer[8];
     void errorTypeB(int lineno,int errorId){
         ok=0;
         if(lex_err == lineno){
@@ -169,7 +169,7 @@ extern int yydebug;
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
-typedef struct Node* YYSTYPE;
+typedef struct _Node_* YYSTYPE;
 # define YYSTYPE_IS_TRIVIAL 1
 # define YYSTYPE_IS_DECLARED 1
 #endif
@@ -2524,7 +2524,10 @@ int main(int argc,char** argv){
     if(ok){
         //printTree(nodeBuffer[0],0);
         printf("Syntax OK!\n");
-        semAnalysis(nodeBuffer[0]);
+        //semAnalysis(nodeBuffer[0]);
+		FILE* file = fopen("tree.txt", "w");
+		putSyntaxTreeToFile(file, nodeBuffer[0]);
+		fclose(file);
     }
     return 0;
 }

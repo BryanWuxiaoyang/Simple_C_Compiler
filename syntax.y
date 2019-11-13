@@ -2,7 +2,7 @@
     #include <stdio.h>
     #include <string.h>
     #include "lex.yy.c"
-    #include "SemanticProcess.h"
+    #include "SemanticAnalysis.h"
     void yyerror(char* msg);
     Node nodeBuffer[8];
     void errorTypeB(int lineno,int errorId){
@@ -28,7 +28,7 @@
     }
 %}
 
-%define api.value.type {Node}
+%define api.value.type {struct _Node_*}
 %locations
 
 %token INT FLOAT ID SEMI COMMA ASSIGNOP RELOP PLUS MINUS STAR DIV AND OR DOT NOT TYPE_INT TYPE_FLOAT LP RP LB RB LC RC STRUCT RETURN IF ELSE WHILE NEG ERROR

@@ -527,7 +527,7 @@ char *yytext;
     #include <malloc.h>
     #include "syntax.tab.h"
     #include "SymTable.h"
-    #include "SemanticProcess.h"
+    #include "SemanticAnalysis.h"
 
     /*INT,FLOAT,ID,SEMI,COMMA,ASSIGNOP,RELOP,PLUS,
     MINUS,STAR,DIV,AND,OR,DOT,NOT,TYPE,LP,RP,LB,
@@ -545,72 +545,15 @@ char *yytext;
         yycolumn += yyleng;\
     }
 
-    // enum {
-    //     Program,
-    //     ExtDefList,
-    //     ExtDef,
-    //     ExtDecList,
-    //     Specifier,
-    //     StructSpecifier,
-    //     OptTag,
-    //     Tag,
-    //     VarDec,
-    //     FunDec,
-    //     VarList,
-    //     ParamDec,
-    //     CompSt,
-    //     StmtList,
-    //     Stmt,
-    //     DefList,
-    //     Def,
-    //     DecList,
-    //     Dec,
-    //     Exp,
-    //     Args,
-    //     Other
-    // };
-    
-    // struct Node {
-    //     char text[32];
-    //     union {
-    //         int int_val;
-    //         float float_val;
-    //     };
-    //     int childNum;
-    //     struct Node* child[8];
-
-    //     int symCode;
-    //     int expandNo;
-    //     int inhSize;
-    //     int inhValues[10];
-    //     int synSize;
-    //     int synValues[10];
-
-    //     int lineno;
-    // };
-    //typedef struct Node Node;
-
-    struct Node* createNode(int childNum,struct Node* child[],int no,int code,int line){
-        struct Node* newNode=(struct Node*)malloc(sizeof(struct Node));
+    Node createNode(int childNum,Node child[],int no,int code,int line){
+        Node newNode=(Node)malloc(sizeof(struct _Node_));
         newNode->childNum=childNum;
         for(int i=0;i<childNum;i++)
             newNode->child[i]=child[i];
         newNode->expandNo=no;
-        newNode->inhSize=0;
-        newNode->synSize=0;
         newNode->symCode=code;
         newNode->lineno=line;
         return newNode;
-    }
-
-    void printTree(struct Node* root,int depth){
-        if(root->text[0]==0)
-            return;
-        for(int i=0;i<depth;i++)
-            printf("  ");
-        printf("%s\n",root->text);
-        for(int i=0;i<root->childNum;i++)
-            printTree(root->child[i],depth+1);
     }
 
     int installINT(){
@@ -656,8 +599,8 @@ char *yytext;
         ok=0;
         printf("Error type A at Line %d: Mysterious characters \'%s\'\n",yylineno,yytext);
     }
-#line 660 "lex.yy.c"
-#line 661 "lex.yy.c"
+#line 603 "lex.yy.c"
+#line 604 "lex.yy.c"
 
 #define INITIAL 0
 
@@ -874,10 +817,10 @@ YY_DECL
 		}
 
 	{
-#line 154 "lexical.l"
+#line 97 "lexical.l"
 
 
-#line 881 "lex.yy.c"
+#line 824 "lex.yy.c"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -946,55 +889,55 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 156 "lexical.l"
+#line 99 "lexical.l"
 {/*No action*/}
 	YY_BREAK
 case 2:
 /* rule 2 can match eol */
 YY_RULE_SETUP
-#line 158 "lexical.l"
+#line 101 "lexical.l"
 {yycolumn = 1; }
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 160 "lexical.l"
+#line 103 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=TYPE_INT;                                    return(TYPE_INT);       }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 161 "lexical.l"
+#line 104 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=TYPE_FLOAT;                                   return(TYPE_FLOAT);       }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 162 "lexical.l"
+#line 105 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=STRUCT;                                   return(STRUCT);     }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 163 "lexical.l"
+#line 106 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RETURN;                                  return(RETURN);     }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 164 "lexical.l"
+#line 107 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=IF;                                     return(IF);         }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 165 "lexical.l"
+#line 108 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=ELSE;                                       return(ELSE);       }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 166 "lexical.l"
+#line 109 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=WHILE;                                  return(WHILE);      }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 167 "lexical.l"
+#line 110 "lexical.l"
 {
-    yylval=createNode(0,NULL,0,Other,yylineno); 
+    yylval=createNode(0,NULL,0,SYN_ID,yylineno); 
     yylval->str_val = (char*)malloc(sizeof(char) * (strlen(yytext) + 2));
     strcpy(yylval->str_val, yytext);  
     last_unit=ID;        
@@ -1003,140 +946,140 @@ YY_RULE_SETUP
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 174 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=installINT();  last_unit=INT;       return(INT);        }
+#line 117 "lexical.l"
+{yylval=createNode(0,NULL,0,SYN_INT,yylineno); yylval->int_val=installINT();  last_unit=INT;       return(INT);        }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 175 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->float_val=installFLOAT(); last_unit=FLOAT;    return(FLOAT);      }
+#line 118 "lexical.l"
+{yylval=createNode(0,NULL,0,SYN_FLOAT,yylineno); yylval->float_val=installFLOAT(); last_unit=FLOAT;    return(FLOAT);      }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 176 "lexical.l"
+#line 119 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=SEMI;                                      return(SEMI);       }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 177 "lexical.l"
+#line 120 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=COMMA;                                     return(COMMA);      }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 178 "lexical.l"
+#line 121 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=ASSIGNOP;                              return(ASSIGNOP);   }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 179 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RELOP;                               return(RELOP);      }
+#line 122 "lexical.l"
+{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_G; last_unit=RELOP;                               return(RELOP);      }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 180 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RELOP;                                 return(RELOP);      }
+#line 123 "lexical.l"
+{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_GE; last_unit=RELOP;                                 return(RELOP);      }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 181 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RELOP;                                      return(RELOP);      }
+#line 124 "lexical.l"
+{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_L; last_unit=RELOP;                                      return(RELOP);      }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 182 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RELOP;                                  return(RELOP);      }
+#line 125 "lexical.l"
+{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_LE; last_unit=RELOP;                                  return(RELOP);      }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 183 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RELOP;                                   return(RELOP);      }
+#line 126 "lexical.l"
+{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_E; last_unit=RELOP;                                   return(RELOP);      }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 184 "lexical.l"
-{yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RELOP;                                    return(RELOP);      }
+#line 127 "lexical.l"
+{yylval=createNode(0,NULL,0,SYN_RELOP,yylineno); yylval->op = OP_NE; last_unit=RELOP;                                    return(RELOP);      }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 185 "lexical.l"
+#line 128 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=PLUS;                                  return(PLUS);       }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 186 "lexical.l"
+#line 129 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB)  {yylval->int_val=last_unit=MINUS;   return(MINUS);}   else{yylval->int_val=last_unit=NEG;  return(NEG); }     }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 187 "lexical.l"
+#line 130 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=STAR;                                 return(STAR);       }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 188 "lexical.l"
+#line 131 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=DIV;                                    return(DIV);        }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 189 "lexical.l"
+#line 132 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=AND;                                        return(AND);        }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 190 "lexical.l"
+#line 133 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=OR;                                         return(OR);         }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 191 "lexical.l"
+#line 134 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=DOT;                                       return(DOT);        }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 192 "lexical.l"
+#line 135 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=NOT;                                         return(NOT);        }
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 193 "lexical.l"
+#line 136 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=LP;                                         return(LP);         }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 194 "lexical.l"
+#line 137 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RP;                                           return(RP);         }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 195 "lexical.l"
+#line 138 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=LB;                                      return(LB);         }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 196 "lexical.l"
+#line 139 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RB;                                     return(RB);         }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 197 "lexical.l"
+#line 140 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=LC;                                           return(LC);         }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 198 "lexical.l"
+#line 141 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=RC;                                     return(RC);         }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 199 "lexical.l"
+#line 142 "lexical.l"
 {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=ERROR;              errorTypeA();       return(ERROR);      }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 201 "lexical.l"
+#line 144 "lexical.l"
 ECHO;
 	YY_BREAK
-#line 1140 "lex.yy.c"
+#line 1083 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2153,7 +2096,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 201 "lexical.l"
+#line 144 "lexical.l"
 
 
 

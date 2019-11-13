@@ -5,6 +5,7 @@
 int symVarCnt = 0;
 int funcVarCnt = 0;
 int tempVarCnt = 0;
+int labelCnt = 0;
 
 char* createName_sym() {
 	symVarCnt++;
@@ -24,5 +25,12 @@ char* createName_temp() {
 	tempVarCnt++;
 	char* name = (char*)malloc(sizeof(char) * 10);
 	if (name) sprintf(name, "v%d", tempVarCnt);
+	return name;
+}
+
+char* createName_label(){
+	labelCnt++;
+	char* name = (char*)malloc(sizeof(char) * 10);
+	if (name) sprintf(name, "v%d", labelCnt);
 	return name;
 }

@@ -1,12 +1,7 @@
 #pragma once
-#include "TypeTable.h"
-
-struct _Sym_ {
-	char* name;
-	Type type;
-	int offset;
-};
-typedef struct _Sym_* Sym;
+#include "defs.h"
+#include "Type.h"
+#include "Sym.h"
 
 struct _SymTable_ {
 	ListHead head;
@@ -23,14 +18,9 @@ SymTable createSymTable(FieldType type) {
 	return table;
 }
 
-ListHead symTableList = MyList_createList();
-SymTable globalSymTable = createSymTable(FIELD_GLOBAL);
-SymTable curSymTable = globalSymTable;
-
-void initSymTable() {
-	curSymTable = globalSymTable;
-	MyList_pushElem(symTableList, globalSymTable);
-}
+ListHead symTableList;
+SymTable globalSymTable;
+SymTable curSymTable;
 
 SymTable getCurSymTable() {
 	return curSymTable;
@@ -92,6 +82,13 @@ Sym findSym_all(const char* name) {
 	}
 	MyList_destroyIterator(it);
 	return res;
+}
+
+void initSymTable() {
+	symTableList = MyList_createList();
+	globalSymTable = createSymTable(FIELD_GLOBAL);
+	curSymTable = globalSymTable;
+	MyList_pushElem(symTableList, globalSymTable);
 }
 
 void printSymTable() {

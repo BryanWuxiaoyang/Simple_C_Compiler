@@ -1,18 +1,11 @@
 #pragma once
 #include "MyList.h"
 #include "defs.h"
+#include "Sym.h"
+#include "Type.h"
 #include <string.h>
 
-struct _Type_ {
-	char* name;
-	enum { BASIC, ARRAY, STRUCTURE } kind;
-	union {
-		int basic;
-		struct { struct _Type_* elemType; int size; } array;
-		ListHead fieldList;
-	} u;
-};
-typedef struct _Type_* Type;
+
 
 struct _TypeTable_ {
 	ListHead head;
@@ -30,14 +23,9 @@ TypeTable createTypeTable(FieldType type) {
 	return table;
 }
 
-ListHead typeTableList = MyList_createList();
-TypeTable globalTypeTable = createTypeTable(FIELD_GLOBAL);
-TypeTable curTypeTable = globalTypeTable;
-
-void initTypeTable() {
-	curTypeTable = globalTypeTable;
-	MyList_pushElem(typeTableList, globalTypeTable);
-}
+ListHead typeTableList;
+TypeTable globalTypeTable;
+TypeTable curTypeTable;
 
 void pushTypeTable(TypeTable table) {
 	if (table) {
@@ -91,14 +79,14 @@ Type findType_all(const char* name) {
 void fillType_basic(Type type, const char* name, int basicId) {
 	type->name = (char*)malloc(sizeof(char) * (strlen(name) + 1));
 	strcpy(type->name, name);
-	type->kind = type->BASIC;
+	type->kind = BASIC;
 	type->u.basic = basicId;
 }
 
 void fillType_array(Type type, const char* name, Type elemType, int size) {
 	type->name = (char*)malloc(sizeof(char) * (strlen(name) + 1));
 	strcpy(type->name, name);
-	type->kind = type->ARRAY;
+	type->kind = ARRAY;
 	type->u.array.elemType = elemType;
 	type->u.array.size = size;
 }
@@ -106,7 +94,7 @@ void fillType_array(Type type, const char* name, Type elemType, int size) {
 void fillType_structure(Type type, const char* name, ListHead fieldList) {
 	type->name = (char*)malloc(sizeof(char) * (strlen(name) + 1));
 	strcpy(type->name, name);
-	type->kind = type->STRUCTURE;
+	type->kind = STRUCTURE;
 	type->u.fieldList = fieldList;
 }
 
@@ -139,13 +127,28 @@ void insertType(TypeTable table, Type type) {
 	MyList_pushElem(table->head, type);
 }
 
-Type integerType = createType_basic("integer", 1);
-Type floatType = createType_basic("float", 2);
-Type errorType = createType_basic("error", 3);
+Type integerType;
+Type floatType;
+Type errorType;
+
+
+void initTypeTable() {
+	typeTableList = MyList_createList();
+	globalTypeTable = createTypeTable(FIELD_GLOBAL);
+	curTypeTable = globalTypeTable;
+	MyList_pushElem(typeTableList, globalTypeTable);
+
+	integerType = createType_basic("integer", 1);
+	floatType = createType_basic("float", 2);
+	errorType = createType_basic("erorr", 3);
+	insertType(getCurTypeTable(), integerType);
+	insertType(getCurTypeTable(), floatType);
+	insertType(getCurTypeTable(), errorType);
+}
 
 void printTypeTable() {
 	printf("type tables:\n");
-	ListIterator it = MyList_createIterator(symTableList);
+	ListIterator it = MyList_createIterator(typeTableList);
 	while (MyList_hasNext(it)) {
 		TypeTable table = (TypeTable)MyList_getNext(it);
 		printf("\typetable: ");
@@ -160,13 +163,13 @@ void printTypeTable() {
 		while (MyList_hasNext(it2)) {
 			Type type = (Type)MyList_getNext(it2);
 			printf("\t\ttype %s, kind ", type->name);
-			if (type->kind == type->BASIC) {
+			if (type->kind == BASIC) {
 				printf("basic, %d\n", type->u.basic);
 			}
-			else if (type->kind == type->ARRAY) {
+			else if (type->kind == ARRAY) {
 				printf("array, size %d, elem type %s\n", type->u.array.size, type->u.array.elemType->name);
 			}
-			else if (type->kind == type->STRUCTURE) {
+			else if (type->kind == STRUCTURE) {
 				printf("struct, fieldList:\n");
 				ListIterator it3 = MyList_createIterator(type->u.fieldList);
 				while (MyList_hasNext(it3)) {

@@ -1,15 +1,6 @@
 #pragma once
 #include "SymTable.h"
-
-struct _Func_ {
-	char* name;
-	ListHead paramList;
-	Type returnType;
-	int state; // 0: unimplemented, 1: implemented
-	int decLineno;
-	int defLineno;
-};
-typedef struct _Func_* Func;
+#include "Func.h"
 
 struct _FuncTable_ {
 	ListHead head;
@@ -24,9 +15,11 @@ FuncTable createFuncTable() {
 	return table;
 }
 
-FuncTable funcTable = createFuncTable();
+FuncTable funcTable;
 
-void initFuncTable(){}
+void initFuncTable(){
+	funcTable = createFuncTable();
+}
 
 FuncTable getCurFuncTable() {
 	return funcTable;

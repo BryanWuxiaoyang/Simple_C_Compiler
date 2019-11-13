@@ -6,7 +6,7 @@
     #include <malloc.h>
     #include "syntax.tab.h"
     #include "SymTable.h"
-    #include "SemanticProcess.h"
+    #include "SemanticAnalysis.h"
 
     /*INT,FLOAT,ID,SEMI,COMMA,ASSIGNOP,RELOP,PLUS,
     MINUS,STAR,DIV,AND,OR,DOT,NOT,TYPE,LP,RP,LB,

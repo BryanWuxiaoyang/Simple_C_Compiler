@@ -124,11 +124,12 @@ Node getSyntaxTreeFromFile(FILE* file) {
 	Node node = (Node)malloc(sizeof(struct _Node_));
 	if (node == NULL) exit(-1);
 	fscanf(file, "%d %d %d %d", &node->symCode, &node->expandNo, &node->lineno, &node->childNum);
+	int t;
 	switch (node->symCode) {
 	case SYN_ID: node->str_val = (char*)malloc(sizeof(char) * 50); fscanf(file, "%s", node->str_val); break;
-	case SYN_RELOP: fscanf(file, "%d", node->op); break;
-	case SYN_INT: fscanf(file, "%d", node->int_val); break;
-	case SYN_FLOAT: fscanf(file, "%f", node->float_val); break;
+	case SYN_RELOP: fscanf(file, "%d", &t); node->op = t; break;
+	case SYN_INT: fscanf(file, "%d", &node->int_val); break;
+	case SYN_FLOAT: fscanf(file, "%f", &node->float_val); break;
 	}
 }
 
