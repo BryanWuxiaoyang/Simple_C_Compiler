@@ -76,11 +76,12 @@ Type findType_all(const char* name) {
 	return res;
 }
 
-void fillType_basic(Type type, const char* name, int basicId) {
+void fillType_basic(Type type, const char* name, int basicId, int size) {
 	type->name = (char*)malloc(sizeof(char) * (strlen(name) + 1));
 	strcpy(type->name, name);
 	type->kind = BASIC;
 	type->u.basic = basicId;
+	type->size = size;
 }
 
 void fillType_array(Type type, const char* name, Type elemType, int size) {
@@ -98,10 +99,10 @@ void fillType_structure(Type type, const char* name, ListHead fieldList) {
 	type->u.fieldList = fieldList;
 }
 
-Type createType_basic(const char* name, int basicId) {
+Type createType_basic(const char* name, int basicId, int size) {
 	Type type = (Type)malloc(sizeof(struct _Type_));
 	if (type) {
-		fillType_basic(type, name, basicId);
+		fillType_basic(type, name, basicId, size);
 	}
 	return type;
 }
@@ -138,9 +139,9 @@ void initTypeTable() {
 	curTypeTable = globalTypeTable;
 	MyList_pushElem(typeTableList, globalTypeTable);
 
-	integerType = createType_basic("integer", BASIC_INTEGER);
-	floatType = createType_basic("float", BASIC_FLOAT);
-	errorType = createType_basic("erorr", BASIC_ERROR);
+	integerType = createType_basic("integer", BASIC_INTEGER, 4);
+	floatType = createType_basic("float", BASIC_FLOAT, 4);
+	errorType = createType_basic("erorr", BASIC_ERROR, 0);
 	insertType(getCurTypeTable(), integerType);
 	insertType(getCurTypeTable(), floatType);
 	insertType(getCurTypeTable(), errorType);

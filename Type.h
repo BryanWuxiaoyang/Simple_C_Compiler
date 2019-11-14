@@ -11,5 +11,6 @@ struct _Type_ {
 		struct { struct _Type_* elemType; int size; } array;
 		ListHead fieldList;
 	} u;
+	int size;
 };
 typedef struct _Type_* Type;

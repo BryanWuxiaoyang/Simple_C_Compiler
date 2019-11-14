@@ -64,6 +64,8 @@ void MyList_destroyIterator(ListIterator it) {
 	free(it);
 }
 
+
+
 ListHead MyList_createList() {
 	ListHead head = (ListHead)malloc(sizeof(struct _ListNode_));
 	if (head) {
@@ -154,4 +156,9 @@ void MyList_insert(ListIterator it, void* elem) {
 	node3->prev = node2;
 	it->prev = node1;
 	it->next = node2;
+}
+
+void MyList_destroyList(ListHead list) {
+	MyList_clear(list);
+	free(list);
 }

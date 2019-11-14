@@ -34,15 +34,39 @@ enum ILOP {
 };
 typedef enum ILOP ILOP;
 
+ILOP getIfRelop(OP op) {
+	switch (op) {
+	case OP_G:	return ILOP_IF_G;
+	case OP_GE: return ILOP_IF_GE;
+	case OP_E:	return ILOP_IF_E;
+	case OP_NE:	return ILOP_IF_NE;
+	case OP_L:	return ILOP_IF_L;
+	case OP_LE:	return ILOP_IF_LE;
+	default:	assert(0);
+	}
+	return ILOP_NONE;
+}
+
+ILOP getAlgorithmOP(OP op) {
+	switch (op) {
+	case OP_PLUS:	return ILOP_PLUS;
+	case OP_MINUS:	return ILOP_MINUS;
+	case OP_STAR:	return ILOP_MUL;
+	case OP_DIV:	return ILOP_DIV;
+	default:		assert(0);
+	}
+	return ILOP_NONE;
+}
+
 struct _InterCode_ {
-	char* arg1;
-	char* arg2;
-	char* target;
+	const char* arg1;
+	const char* arg2;
+	const char* target;
 	ILOP op;
 };
 typedef struct _InterCode_* InterCode;
 
-InterCode createInterCode(char* arg1, char* arg2, char* target, ILOP op) {
+InterCode createInterCode(const char* arg1,const char* arg2, const char* target, ILOP op) {
 	InterCode code = (InterCode)malloc(sizeof(struct _InterCode_));
 	if (code) {
 		code->arg1 = arg1;
@@ -63,10 +87,19 @@ void appendInterCode(InterCode code) {
 	MyList_pushElem(interCodeList, code);
 }
 
+void backpatchCode(ListHead codeList, char* label) {
+	ListIterator it = MyList_createIterator(codeList);
+	while (MyList_hasNext(it)) {
+		InterCode code = (InterCode)MyList_getNext(it);
+		code->target = label;
+	}
+	MyList_destroyIterator(it);
+}
+
 void printInterCode(InterCode code) {
-	char* arg1 = code->arg1;
-	char* arg2 = code->arg2;
-	char* target = code->target;
+	const char* arg1 = code->arg1;
+	const char* arg2 = code->arg2;
+	const char* target = code->target;
 	switch (code->op) {
 	case	ILOP_LABEL:		printf("LABEL %s :", target); break;
 	case 	ILOP_FUNCTION:	printf("FUNCTION %s :", target); break;

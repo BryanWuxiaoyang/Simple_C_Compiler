@@ -31,6 +31,6 @@ char* createName_temp() {
 char* createName_label(){
 	labelCnt++;
 	char* name = (char*)malloc(sizeof(char) * 10);
-	if (name) sprintf(name, "v%d", labelCnt);
+	if (name) sprintf(name, "L%d", labelCnt);
 	return name;
 }
