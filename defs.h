@@ -38,18 +38,18 @@ void assignConstValue(ConstValue* src, ConstValue* dst) {
 	switch (src->type) {
 	case CONST_INTEGER: assignConstInteger(src->v.constInteger, dst); break;
 	case CONST_FLOAT:	assignConstFloat(src->v.constFloat, dst); break;
-	default:			exit(-1);
+	default:			assert(0);
 	}
 }
 
-int getConstInt(ConstValue* v) {
-	assert(v->type == CONST_INTEGER);
-	return v->v.constInteger;
+int getConstInt(ConstValue v) {
+	assert(v.type == CONST_INTEGER);
+	return v.v.constInteger;
 }
 
-float getConstFloat(ConstValue* v) {
-	assert(v->type == CONST_FLOAT);
-	return v->v.constFloat;
+float getConstFloat(ConstValue v) {
+	assert(v.type == CONST_FLOAT);
+	return v.v.constFloat;
 }
 
 char* concatStr(const char* str1, const char* str2) {

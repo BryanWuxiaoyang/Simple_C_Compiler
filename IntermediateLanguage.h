@@ -64,6 +64,8 @@ struct _InterCode_ {
 };
 typedef struct _InterCode_* InterCode;
 
+void printInterCode(InterCode code);
+
 InterCode createInterCode(const char* arg1,const char* arg2, const char* target, ILOP op) {
 	InterCode code = (InterCode)malloc(sizeof(struct _InterCode_));
 	if (code) {
@@ -108,6 +110,7 @@ ListHead getInterCodeList() {
 
 void appendInterCode(InterCode code) {
 	MyList_pushElem(interCodeList, code);
+	printInterCode(code);
 }
 
 void insertInterCode(CodeIterator it, InterCode code) {
@@ -144,7 +147,7 @@ void printInterCode(InterCode code) {
 	case 	ILOP_MUL:		printf("%s := %s * %s", target, arg1, arg2); break;
 	case 	ILOP_DIV:		printf("%s := %s / %s", target, arg1, arg2); break;
 	case 	ILOP_ADDR:		printf("%s := &%s", target, arg1); break;
-	case 	ILOP_GOTO:		printf("GOTO %s\n", target); break;
+	case 	ILOP_GOTO:		printf("GOTO %s", target); break;
 	case 	ILOP_IF_G:		printf("IF %s > %s GOTO %s", arg1, arg2, target); break;
 	case 	ILOP_IF_GE:		printf("IF %s >= %s GOTO %s", arg1, arg2, target); break;
 	case 	ILOP_IF_E:		printf("IF %s == %s GOTO %s", arg1, arg2, target); break;

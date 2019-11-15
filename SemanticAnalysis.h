@@ -88,8 +88,9 @@ const char* getSymCodeStr(int code) {
 	case Dec:return "Dec";
 	case Exp:return "Exp";
 	case Args:return "Args";
-	default:printf("enter error!\n"); exit(-1);
+	default:printf("enter error!\n"); assert(0);
 	}
+	return NULL;
 }
 void testEnterPrint(Node node) {
 	indent++;
@@ -124,7 +125,7 @@ void putSyntaxTreeToFile(FILE* file, Node node) {
 
 Node getSyntaxTreeFromFile(FILE* file) {
 	Node node = (Node)malloc(sizeof(struct _Node_));
-	if (node == NULL) exit(-1);
+	if (node == NULL) assert(0);
 	fscanf(file, "%d %d %d %d", &node->symCode, &node->expandNo, &node->lineno, &node->childNum);
 	int t;
 	switch (node->symCode) {
@@ -243,10 +244,18 @@ void SM_ExtDef(Node node) {
 		Node compStNode = node->child[2];
 		Type specType = NULL;
 		ListHead nextList = MyList_createList();
-		clearASTOps();
+		
+		pushSymTable(createSymTable(FIELD_COMPST));
+		pushTypeTable(createTypeTable(FIELD_COMPST));
+		pushInnerASTTable();
+
 		SM_Specifier(specifierNode, &specType);
 		SM_FunDec(funDecNode, specType, 1);
 		SM_CompSt(compStNode, specType, nextList);
+
+		popSymTable();
+		popTypeTable();
+		popInnerASTTable();
 		
 		if (MyList_isEmpty(nextList) == 0) {
 			char* label = createName_label();
@@ -378,12 +387,6 @@ void SM_VarDec(Node node, Type type, Sym* ret_var, ASTNode* ret_astNode) {
 		Sym sym = createSym(name, type);
 		ASTNode astNode = createASTNode_sym(sym);
 
-		char* size = (char*)malloc(sizeof(char) * 10);
-		if (size) {
-			sprintf(size, "%d", sym->type->size);
-			appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(astNode), ILOP_DEC));
-		}
-
 		if (ret_var)* ret_var = sym;
 		if (ret_astNode)* ret_astNode = astNode;
 	}
@@ -422,6 +425,14 @@ void SM_FunDec(Node node, Type specType, int isDef) {
 			func = createFunc(name, paramList, specType);
 			insertFunc(getCurFuncTable(), func);
 			declareFunc(func, node->lineno);
+			
+			// insert params into local symTable
+			ListIterator it = MyList_createIterator(paramList);
+			while (MyList_hasNext(it)) {
+				Sym param = (Sym)MyList_getNext(it);
+				insertSym(getCurSymTable(), param);
+			}
+			MyList_destroyIterator(it);
 
 			appendInterCode(createInterCode(NULL, NULL, func->name, ILOP_FUNCTION));
 		}
@@ -497,12 +508,8 @@ void SM_CompSt(Node node, Type returnType, ListHead nextList) {
 		Node defListNode = node->child[1];
 		Node stmtListNode = node->child[2];
 
-		pushSymTable(createSymTable(FIELD_COMPST));
-		pushTypeTable(createTypeTable(FIELD_COMPST));
 		SM_DefList(defListNode);
 		SM_StmtList(stmtListNode, returnType, nextList);
-		popSymTable();
-		popTypeTable();
 	}
 #ifdef TEST_MODE
 	testExitPrint(node);
@@ -547,7 +554,12 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 	}
 	else if (node->expandNo == 2) {// CompSt
 		Node compStNode = node->child[0];
+
+		pushSymTable(createSymTable(FIELD_COMPST));
+		pushTypeTable(createTypeTable(FIELD_COMPST));
 		SM_CompSt(compStNode, returnType, nextList);
+		popSymTable();
+		popTypeTable();
 	}
 	else if (node->expandNo == 3) {// RETURN Exp SEMI
 		Node expNode = node->child[1];
@@ -559,38 +571,91 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 	else if (node->expandNo == 4) {// IF LP Exp RP Stmt
 		Node expNode = node->child[2];
 		Node stmtNode = node->child[4];
+		ASTNode astNode = NULL;
 		ListHead trueList = MyList_createList();
-		SM_Exp(expNode, NULL, trueList, nextList, 1, 0);
+		SM_Exp(expNode, &astNode, trueList, nextList, 1, 0);
 
-		char* label = createName_label();
-		backpatchCode(trueList, label);
-		appendInterCode(createInterCode(NULL, NULL, label, ILOP_LABEL));
+		if (isConstASTNode(astNode) && getConstInt(getConstValue(astNode)) == 1) {
+				SM_Stmt(stmtNode, returnType, nextList);
+		}
+		else {
+			if (MyList_isEmpty(trueList) == 0) {
+				char* label = createName_label();
+				backpatchCode(trueList, label);
+				appendInterCode(createInterCode(NULL, NULL, label, ILOP_LABEL));
+			}
+
+			pushInnerASTTable();
+			SM_Stmt(stmtNode, returnType, nextList);
+			popInnerASTTable();
+			removeASTNodes();
+		}
+
 		MyList_destroyList(trueList);
-
-		SM_Stmt(stmtNode, returnType, nextList);
 	}
 	else if (node->expandNo == 5) {// IF LP Exp RP Stmt ELSE Stmt
 		Node expNode = node->child[2];
 		Node stmtNode1 = node->child[4];
 		Node stmtNode2 = node->child[6];
+		ASTNode astNode = NULL;
 		ListHead trueList = MyList_createList();
 		ListHead falseList = MyList_createList();
 		char* label1 = createName_label();
 		char* label2 = createName_label();
 
-		SM_Exp(expNode, NULL, trueList, falseList, 1, 0);
+		SM_Exp(expNode, &astNode, trueList, falseList, 1, 0);
 
-		appendInterCode(createInterCode(NULL, NULL, label1, ILOP_LABEL));
-		
-		
-		SM_Stmt(stmtNode1, returnType, falseList);
+		if (isConstASTNode(astNode)) {
+			ConstValue value = getConstValue(astNode);
+			if(getConstInt(value)){
+				SM_Stmt(stmtNode1, returnType, falseList);
+			}
+			else {
+				SM_Stmt(stmtNode2, returnType, nextList);
+			}
+		}
+		else {
+			ListHead removeList = MyList_createList();
 
-		appendInterCode(createInterCode(NULL, NULL, label2, ILOP_LABEL));
+			if (MyList_isEmpty(trueList) == 0) {
+				appendInterCode(createInterCode(NULL, NULL, label1, ILOP_LABEL));
+			}
+			
+			pushInnerASTTable();
+			SM_Stmt(stmtNode1, returnType, falseList);
+			popInnerASTTable();
 
-		SM_Stmt(stmtNode2, returnType, nextList);
+			InnerASTNodeIterator it = createInnerASTNodeIterator();
+			while (hasNextInnerASTNode(it)) {
+				ASTNode node = getNextInnerASTNode(it);
+				if (node->removeTag > 0) {
+					MyList_pushElem(removeList, node);
+					node->removeTag = 0;
+				}
+			}
+			destroyInnerASTNodeIterator(it);
+			
+			if (MyList_isEmpty(falseList) == 0) {
+				appendInterCode(createInterCode(NULL, NULL, label2, ILOP_LABEL));
+			}
 
-		backpatchCode(trueList, label1);
-		backpatchCode(falseList, label2);
+			pushInnerASTTable();
+			SM_Stmt(stmtNode2, returnType, nextList);
+			popInnerASTTable();
+
+			ListIterator removeIt = MyList_createIterator(removeList);
+			while (MyList_hasNext(removeIt)) {
+				ASTNode node = (ASTNode)MyList_getNext(removeIt);
+				node->removeTag = 1;
+			}
+			MyList_destroyIterator(removeIt);
+			
+			removeASTNodes();
+
+			backpatchCode(trueList, label1);
+			backpatchCode(falseList, label2);
+		}
+
 		MyList_destroyList(trueList);
 		MyList_destroyList(falseList);
 	}
@@ -662,17 +727,30 @@ void SM_Dec(Node node, Type specType, Sym* ret_var) {
 #endif
 	if (node->expandNo == 1) {// VarDec
 		Node varDecNode = node->child[0];
-		SM_VarDec(varDecNode, specType, ret_var, NULL);
+		ASTNode astNode = NULL;
+		SM_VarDec(varDecNode, specType, ret_var, &astNode);
+
+		if (getCurSymTable()->type != FIELD_STRUCT) {
+			char* size = (char*)malloc(sizeof(char) * 10);
+			if (size) {
+				sprintf(size, "%d", (*ret_var)->type->size);
+				appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(astNode), ILOP_DEC));
+			}
+		}
 	}
 	else if (node->expandNo == 2) {// VarDec ASSIGNOP Exp
 		Node varDecNode = node->child[0];
 		Node expNode = node->child[2];
 		ASTNode astNode1 = NULL;
 		ASTNode astNode2 = NULL;
-		SM_VarDec(varDecNode, specType, ret_var, NULL);
+		SM_VarDec(varDecNode, specType, ret_var, &astNode1);
 		SM_Exp(expNode, &astNode2, NULL, NULL, 0, 0);
 
-		astNode1 = createASTNode_sym(*ret_var);
+		char* size = (char*)malloc(sizeof(char) * 10);
+		if (size) {
+			sprintf(size, "%d", (*ret_var)->type->size);
+			appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(astNode1), ILOP_DEC));
+		}
 		InterCode code = createInterCode(getASTNodeStr_r(astNode2), NULL, getASTNodeStr_l(astNode1), ILOP_ASSIGN);
 		appendInterCode(code);
 	}
@@ -713,7 +791,12 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 			appendInterCode(createInterCode(NULL, NULL, label, ILOP_LABEL));
 		}
 
-		SM_Exp(expNode2, &astNode2, trueList, falseList, trueFall, falseFall);
+		if (isConstASTNode(astNode1) && getConstInt(getConstValue(astNode1)) == 0) {
+			astNode2 = createASTNode_integer(0);
+		}
+		else {
+			SM_Exp(expNode2, &astNode2, trueList, falseList, trueFall, falseFall);
+		}
 
 		MyList_destroyList(tmpTrueList);
 		if (ret_astNode)* ret_astNode = createASTNode_op(OP_AND, astNode1, astNode2);
@@ -734,7 +817,12 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 			backpatchCode(tmpFalseList, createName_label());
 		}
 
-		SM_Exp(expNode2, &astNode2, trueList, falseList, trueFall, falseFall);
+		if (isConstASTNode(astNode1) && getConstInt(getConstValue(astNode1)) == 1) {
+			astNode2 = createASTNode_integer(1);
+		}
+		else {
+			SM_Exp(expNode2, &astNode2, trueList, falseList, trueFall, falseFall);
+		}
 
 		MyList_destroyList(tmpFalseList);
 		if (ret_astNode)* ret_astNode = createASTNode_op(OP_OR, astNode1, astNode2);
@@ -754,12 +842,12 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 
 		if (isConstASTNode(resNode)) {
 			ConstValue value = getConstValue(resNode);
-			if (getConstInt(&value) != 0 && trueFall == 0) {
+			if (getConstInt(value) != 0 && trueFall == 0) {
 				InterCode code = createInterCode(NULL, NULL, NULL, ILOP_GOTO);
 				appendInterCode(code);
 				MyList_pushElem(trueList, code);
 			}
-			else if (getConstInt(&value) == 0 && falseFall == 0) {
+			else if (getConstInt(value) == 0 && falseFall == 0) {
 				InterCode code = createInterCode(NULL, NULL, NULL, ILOP_GOTO);
 				appendInterCode(code);
 				MyList_pushElem(falseList, code);
@@ -768,7 +856,7 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		else {
 			if (trueFall == 0 && falseFall == 0) {
 				ILOP ilop = getIfRelop(op);
-				InterCode code1 = createInterCode(NULL, NULL, NULL, ilop);
+				InterCode code1 = createInterCode(getASTNodeStr_r(astNode1), getASTNodeStr_r(astNode2), NULL, ilop);
 				InterCode code2 = createInterCode(NULL, NULL, NULL, ILOP_GOTO);
 				appendInterCode(code1);
 				appendInterCode(code2);
@@ -777,14 +865,14 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 			}
 			else if (trueFall == 0) {
 				ILOP ilop = getIfRelop(op);
-				InterCode code = createInterCode(NULL, NULL, NULL, ilop);
+				InterCode code = createInterCode(getASTNodeStr_r(astNode1), getASTNodeStr_r(astNode2), NULL, ilop);
 				appendInterCode(code);
 				MyList_pushElem(trueList, code);
 			}
 			else if (falseFall == 0) {
 				op = getReverseRelop(op);
 				ILOP ilop = getIfRelop(op);
-				InterCode code = createInterCode(NULL, NULL, NULL, ilop);
+				InterCode code = createInterCode(getASTNodeStr_r(astNode1), getASTNodeStr_r(astNode2), NULL, ilop);
 				appendInterCode(code);
 				MyList_pushElem(falseList, code);
 			}
@@ -877,7 +965,9 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		Node expNode = node->child[0];
 		Node idNode = node->child[2];
 		char* name = idNode->str_val;
-		Sym structSym = findSym_all(name);
+		ASTNode structSymNode = NULL;
+		SM_Exp(expNode, &structSymNode, NULL, NULL, 0, 0);
+		Sym structSym = structSymNode->value.sym;
 		Sym fieldSym = NULL;
 
 		ListIterator it = MyList_createIterator(structSym->type->u.fieldList);
@@ -892,10 +982,15 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 
 		if (fieldSym == NULL) assert(0);
 		int offset = fieldSym->offset;
-		ASTNode structSymNode = createASTNode_sym(structSym);
 		ASTNode refNode = createASTNode_op(OP_REF, structSymNode, NULL);
-		ASTNode offsetNode = createASTNode_integer(offset);
-		ASTNode addNode = createASTNode_op(OP_PLUS, refNode, offsetNode);
+		ASTNode addNode = NULL;
+		if (offset == 0) {
+			addNode = refNode;
+		}
+		else {
+			ASTNode offsetNode = createASTNode_integer(offset);
+			addNode = createASTNode_op(OP_PLUS, refNode, offsetNode);
+		}
 		ASTNode derefNode = createASTNode_op(OP_DEREF, addNode, NULL);
 
 		translateASTTree(derefNode);

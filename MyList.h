@@ -162,3 +162,11 @@ void MyList_destroyList(ListHead list) {
 	MyList_clear(list);
 	free(list);
 }
+
+void* MyList_getBack(ListHead list) {
+	return list->prev->elem;
+}
+
+void* MyList_getFront(ListHead list) {
+	return list->next->elem;
+}

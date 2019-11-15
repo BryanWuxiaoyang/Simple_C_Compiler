@@ -34,14 +34,8 @@ int isRelop(OP op) {
 	return 0;
 }
 
-int isLogicOp(OP op) {
+int isCondOp(OP op) {
 	switch (op) {
-	case OP_G:
-	case OP_GE:
-	case OP_E:
-	case OP_NE:
-	case OP_L:
-	case OP_LE:	
 	case OP_AND:
 	case OP_OR:	
 	case OP_NOT:	return 1;
@@ -78,16 +72,18 @@ OP getReverseRelop(OP op) {
 int procOP1_int(OP op, int arg) {
 	switch (op) {
 	case OP_NEG:	return -arg;
-	case OP_NOT:	return arg != 0;
-	default:		exit(-1);
+	case OP_NOT:	return !arg;
+	default:		assert(0);
 	}
+	return 0;
 }
 
 float procOP1_float(OP op, float arg){
 	switch (op) {
 	case OP_NEG:	return -arg;
-	default:		exit(-1);
+	default:		assert(0);
 	}
+	return 0;
 }
 
 int procOP2_int(OP op, int arg1, int arg2) {
@@ -104,8 +100,9 @@ int procOP2_int(OP op, int arg1, int arg2) {
 	case OP_LE:		return arg1 <= arg2;
 	case OP_AND:	return arg1 && arg2;
 	case OP_OR:		return arg1 || arg2;
-	default:		exit(-1);
+	default:		assert(0);
 	}
+	return 0;
 }
 
 
@@ -123,6 +120,7 @@ float procOP2_float(OP op, float arg1, float arg2) {
 	case OP_LE:		return arg1 <= arg2;
 	case OP_AND:	return arg1 && arg2;
 	case OP_OR:		return arg1 || arg2;
-	default:		exit(-1);
+	default:		assert(0);
 	}
+	return 0;
 }
