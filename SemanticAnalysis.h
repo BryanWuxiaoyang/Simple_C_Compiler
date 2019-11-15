@@ -603,6 +603,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 		char* label1 = createName_label();
 		char* label2 = createName_label();
 
+		printASTNodes();
 		SM_Exp(expNode, &astNode, trueList, falseList, 1, 0);
 
 		if (isConstASTNode(astNode)) {
@@ -621,9 +622,12 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 				appendInterCode(createInterCode(NULL, NULL, label1, ILOP_LABEL));
 			}
 			
+			removeASTNodes(); // 清除掉之前的remove标记
 			pushInnerASTTable();
+			printASTNodes();
 			SM_Stmt(stmtNode1, returnType, falseList);
 			popInnerASTTable();
+			printASTNodes();
 
 			InnerASTNodeIterator it = createInnerASTNodeIterator();
 			while (hasNextInnerASTNode(it)) {
@@ -642,6 +646,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			pushInnerASTTable();
 			SM_Stmt(stmtNode2, returnType, nextList);
 			popInnerASTTable();
+			printASTNodes();
 
 			ListIterator removeIt = MyList_createIterator(removeList);
 			while (MyList_hasNext(removeIt)) {
@@ -651,6 +656,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			MyList_destroyIterator(removeIt);
 			
 			removeASTNodes();
+			printASTNodes();
 
 			backpatchCode(trueList, label1);
 			backpatchCode(falseList, label2);

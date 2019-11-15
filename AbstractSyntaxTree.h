@@ -86,8 +86,19 @@ void destroyInnerASTNodeIterator(InnerASTNodeIterator it) {
 
 int hasNextInnerASTNode(InnerASTNodeIterator it) {
 	if (MyList_hasNext(it->nodeIt)) return 1;
-	else if (MyList_hasNext(it->tableListIt)) return 1;
-	else return 0;
+	else {
+		int suc = 0;
+		while (MyList_hasNext(it->tableListIt)) {
+			ASTTable table = (ASTTable)MyList_getNext(it->tableListIt);
+			if (MyList_isEmpty(table->list) == 0) {
+				MyList_destroyIterator(it->nodeIt);
+				it->nodeIt = MyList_createIterator(table->list);
+				suc = 1;
+				break;
+			}
+		}
+		return suc;
+	}
 }
 
 ASTNode getNextInnerASTNode(InnerASTNodeIterator it) {
@@ -177,37 +188,42 @@ ListHead getASTNodeList(int height) {
 }
 
 ASTNode findASTNode(int height, ASTNodeType type, ASTNodeValue value, ASTNode lc, ASTNode rc) {
-	ListHead list = getASTNodeList(height);
-	ListIterator it = MyList_createIterator(list);
-	ASTNode res = NULL;
-	while (MyList_hasNext(it)) {
-		ASTNode node = (ASTNode)MyList_getNext(it);
-		int suc = 0;
-		switch (type) {
-		case AST_INTEGER:
-			suc = (node->removeTag == 0 && node->type == AST_INTEGER && node->value.intValue == value.intValue && node->lc == lc && node->rc == rc) ? 1 : 0;
-			break;
-		case AST_FLOAT:
-			suc = (node->removeTag == 0 && node->type == AST_FLOAT && node->value.floatValue == value.floatValue && node->lc == lc && node->rc == rc) ? 1 : 0;
-			break;
-		case AST_SYM:
-			suc = (node->removeTag == 0 && node->type == AST_SYM && node->value.sym == value.sym && node->lc == lc && node->rc == rc) ? 1 : 0;
-			break;
-		case AST_FUNC:
-			suc = (node->removeTag == 0 && node->type == AST_FUNC && node->value.func == value.func && node->lc == lc && node->rc == rc) ? 1 : 0;
-			break;
-		case AST_OP:
-			suc = (node->removeTag == 0 && node->type == AST_OP && node->value.op == value.op && node->lc == lc && node->rc == rc) ? 1 : 0;
-			break;
-		default:assert(0);
+	if (type == AST_OP) {
+		InnerASTNodeIterator it = createInnerASTNodeIterator();
+		while (hasNextInnerASTNode(it)) {
+			ASTNode node = getNextInnerASTNode(it);
+			if (node->removeTag == 0 && node->type == AST_OP && node->value.op == value.op && node->lc == lc && node->rc == rc){
+				destroyInnerASTNodeIterator(it);
+				return node;
+			}
 		}
-		if (suc) {
-			res = node;
-			break;
-		}
+		destroyInnerASTNodeIterator(it);
 	}
-	MyList_destroyIterator(it);
-	return res;
+	else {
+		ListIterator it2 = MyList_createIterator(getLeafASTTable()->list);
+		while (MyList_hasNext(it2)) {
+			ASTNode node = (ASTNode)MyList_getNext(it2);
+			int suc = 0;
+			switch (type) {
+			case AST_INTEGER:
+				suc = (node->removeTag == 0 && node->type == AST_INTEGER && node->value.intValue == value.intValue && node->lc == lc && node->rc == rc) ? 1 : 0;
+				break;
+			case AST_FLOAT:
+				suc = (node->removeTag == 0 && node->type == AST_FLOAT && node->value.floatValue == value.floatValue && node->lc == lc && node->rc == rc) ? 1 : 0;
+				break;
+			case AST_SYM:
+				suc = (node->removeTag == 0 && node->type == AST_SYM && node->value.sym == value.sym && node->lc == lc && node->rc == rc) ? 1 : 0;
+				break;
+			default:assert(0);
+			}
+			if (suc) {
+				MyList_destroyIterator(it2);
+				return node;
+			}
+		}
+		MyList_destroyIterator(it2);
+	}
+	return NULL;
 }
 
 ASTNode findASTNode_sym(Sym sym) {
@@ -282,22 +298,9 @@ int isConstCond(OP op, ASTNode node1, ASTNode node2) {
 void clearParents(ASTNode lc) {
 	ListIterator parents_it = MyList_createIterator(lc->parents);
 	while (MyList_hasNext(parents_it)) {
-		ASTNode node = (ASTNode)MyList_getNext(parents_it);
-		ListHead list = getASTNodeList(node->height);
-
-		ListIterator list_it = MyList_createIterator(list);
-		while (MyList_hasNext(list_it)) {
-			ASTNode list_node = (ASTNode)MyList_getNext(list_it);
-
-			if (node == list_node) {
-				clearParents(list_node);
-				//MyList_removePrev(list_it);
-				list_node->removeTag = 1;
-				break;
-			}
-		}
-		MyList_destroyIterator(list_it);
-
+		ASTNode pNode = (ASTNode)MyList_getNext(parents_it);
+		pNode->removeTag = 1;
+		clearParents(pNode);
 	}
 	MyList_destroyIterator(parents_it);
 	MyList_clear(lc->parents);
@@ -497,11 +500,9 @@ ASTNode createASTNode_op(OP op, ASTNode lc, ASTNode rc) {
 	return node;
 }
 
-
 int astIndent = -1;
-void printASTTree(ASTNode node) {
-	if (node == NULL) return;
-	astIndent++;
+
+void printASTNode(ASTNode node) {
 	for (int i = 0; i < astIndent; i++)
 		printf("\t");
 	switch (node->type) {
@@ -509,11 +510,35 @@ void printASTTree(ASTNode node) {
 	case AST_FLOAT:		printf("float: %s", ftostr(node->value.floatValue)); break;
 	case AST_SYM:		printf("symbal: %s --> var: %s", node->value.sym->name, node->name); break;
 	case AST_FUNC:		printf("func: %s --> return var: %s", node->value.func->name, node->name); break;
-	case AST_OP:		printf("op: %d --> var: %s", node->value.op, node->name); break;
+	case AST_OP:		printf("op: %d --> var: %s, lc: %s, rc: %s", node->value.op, node->name, getASTNodeStr_r(node->lc), getASTNodeStr_r(node->rc)); break;
 	default:			printf("error!"); assert(0);
 	}
+	printf(", removeTag: %d", node->removeTag);
 	printf("\n");
+}
+
+void printASTTree(ASTNode node) {
+	if (node == NULL) return;
+	astIndent++;
+	printASTNode(node);
 	printASTTree(node->lc);
 	printASTTree(node->rc);
 	astIndent--;
+}
+
+void printASTNodes() {
+	printf("astNodes:\n");
+	ListIterator it = MyList_createIterator(getLeafASTTable()->list);
+	while (MyList_hasNext(it)) {
+		ASTNode node = (ASTNode)MyList_getNext(it);
+		printASTNode(node);
+	}
+	MyList_destroyIterator(it);
+
+	InnerASTNodeIterator it2 = createInnerASTNodeIterator();
+	while (hasNextInnerASTNode(it2)) {
+		ASTNode node = getNextInnerASTNode(it2);
+		printASTNode(node);
+	}
+	destroyInnerASTNodeIterator(it2);
 }
