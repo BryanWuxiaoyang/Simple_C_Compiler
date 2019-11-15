@@ -1,8 +1,30 @@
+struct Node{
+    int a;
+    float b;
+};
+
+int f(int c, struct Node node_){
+    c = 2;
+    return c;
+}
+
 int main(){
-    int a, b;
-    a = 5;
-    b = 4;
-    a = (a + 1) + (a = 2) + (a + 1);
-    b = a * 3 + 5;
+    int d, e, f, g;
+    struct Node node;
+    d = 2;
+    e = 4;
+    if(d > e && f < g){
+        d = d * 3;
+    }
+
+    if(d > e || f > g){
+        d = d * 4;
+    }
+    else{
+        d = d / 2;
+    }
+    node.a = 1;
+    d = node.a;
+    f(d, node);
     return 0;
 }
