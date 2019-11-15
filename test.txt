@@ -1,9 +1,8 @@
 int main(float a){
-    int b = 2, c;
+    int b, c = 1;
     c = c + 1;
-    b = c + 1;
     if(b > c){
-        c = 2;
+        c = b;
     }
     else{
         b = c + 1;
