@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h>
+#include <string.h>
 
 enum FieldType{ FIELD_GLOBAL, FIELD_STRUCT, FIELD_COMPST };
 typedef enum FieldType FieldType;
@@ -29,6 +30,10 @@ void assignConstFloat(float value, ConstValue* dst) {
 	dst->v.constFloat = value;
 }
 
+void assignConstNone(ConstValue* dst) {
+	dst->type = CONST_NONE;
+}
+
 void assignConstValue(ConstValue* src, ConstValue* dst) {
 	switch (src->type) {
 	case CONST_INTEGER: assignConstInteger(src->v.constInteger, dst); break;
@@ -45,4 +50,10 @@ int getConstInt(ConstValue* v) {
 float getConstFloat(ConstValue* v) {
 	assert(v->type == CONST_FLOAT);
 	return v->v.constFloat;
+}
+
+char* concatStr(const char* str1, const char* str2) {
+	char* str = (char*)malloc(sizeof(char) * (strlen(str1) + strlen(str2) + 2));
+	if(str) sprintf(str, "%s%s", str1, str2);
+	return str;
 }

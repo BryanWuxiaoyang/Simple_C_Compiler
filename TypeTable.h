@@ -97,6 +97,15 @@ void fillType_structure(Type type, const char* name, ListHead fieldList) {
 	strcpy(type->name, name);
 	type->kind = STRUCTURE;
 	type->u.fieldList = fieldList;
+	ListIterator it = MyList_createIterator(fieldList);
+	int offset = 0;
+	while (MyList_hasNext(it)) {
+		Sym sym = (Sym)MyList_getNext(it);
+		sym->offset = offset;
+		offset += sym->type->size;
+	}
+	MyList_destroyIterator(it);
+	type->size = offset;
 }
 
 Type createType_basic(const char* name, int basicId, int size) {

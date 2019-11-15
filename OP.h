@@ -15,9 +15,52 @@ enum OP {
 	OP_STAR,
 	OP_DIV,
 	OP_NEG,
-	OP_NOT
+	OP_NOT,
+	OP_REF,
+	OP_DEREF
 };
 typedef enum OP OP;
+
+int isRelop(OP op) {
+	switch (op) {
+	case OP_G:
+	case OP_GE:
+	case OP_E:
+	case OP_NE:
+	case OP_L:
+	case OP_LE:	return 1;
+	default:	return 0;
+	}
+	return 0;
+}
+
+int isLogicOp(OP op) {
+	switch (op) {
+	case OP_G:
+	case OP_GE:
+	case OP_E:
+	case OP_NE:
+	case OP_L:
+	case OP_LE:	
+	case OP_AND:
+	case OP_OR:	
+	case OP_NOT:	return 1;
+	default:		return 0;
+	}
+	return 0;
+}
+
+int isAlgorithmOp(OP op) {
+	switch (op) {
+		case OP_PLUS:
+		case OP_MINUS:
+		case OP_STAR:
+		case OP_DIV:
+		case OP_NEG:	return 1;
+		default:		return 0;
+	}
+	return 0;
+}
 
 OP getReverseRelop(OP op) {
 	switch (op) {

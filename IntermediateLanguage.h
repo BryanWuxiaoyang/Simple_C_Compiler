@@ -15,8 +15,6 @@ enum ILOP {
 	ILOP_MUL,
 	ILOP_DIV,
 	ILOP_ADDR,
-	ILOP_RDEREF,
-	ILOP_LDEREF,
 	ILOP_GOTO,
 	ILOP_IF_G,
 	ILOP_IF_GE,
@@ -79,12 +77,49 @@ InterCode createInterCode(const char* arg1,const char* arg2, const char* target,
 
 ListHead interCodeList;
 
+struct _CodeIterator_ {
+	ListIterator it;
+};
+typedef struct _CodeIterator_* CodeIterator;
+
 void initIL(){
 	interCodeList = MyList_createList();
 }
 
+CodeIterator createCodeIterator() {
+	CodeIterator it = (CodeIterator)malloc(sizeof(struct _CodeIterator_));
+	if (it) {
+		it->it = MyList_createIterator(interCodeList);
+	}
+	return it;
+}
+
+int hasNextCode(CodeIterator it) {
+	return MyList_hasNext(it->it);
+}
+
+InterCode getNextCode(CodeIterator it) {
+	return (InterCode)MyList_getNext(it->it);
+}
+
+ListHead getInterCodeList() {
+	return interCodeList;
+}
+
 void appendInterCode(InterCode code) {
 	MyList_pushElem(interCodeList, code);
+}
+
+void insertInterCode(CodeIterator it, InterCode code) {
+	MyList_insert(it->it, code);
+}
+
+InterCode removeInterCode_prev(CodeIterator it) {
+	return (InterCode)MyList_removePrev(it->it);
+}
+
+InterCode removeInterCode_next(CodeIterator it) {
+	return (InterCode)MyList_removeNext(it->it);
 }
 
 void backpatchCode(ListHead codeList, char* label) {
@@ -109,8 +144,6 @@ void printInterCode(InterCode code) {
 	case 	ILOP_MUL:		printf("%s := %s * %s", target, arg1, arg2); break;
 	case 	ILOP_DIV:		printf("%s := %s / %s", target, arg1, arg2); break;
 	case 	ILOP_ADDR:		printf("%s := &%s", target, arg1); break;
-	case 	ILOP_RDEREF:	printf("%s := *%s", target, arg1); break;
-	case 	ILOP_LDEREF:	printf("*%s := %s", target, arg1); break;
 	case 	ILOP_GOTO:		printf("GOTO %s\n", target); break;
 	case 	ILOP_IF_G:		printf("IF %s > %s GOTO %s", arg1, arg2, target); break;
 	case 	ILOP_IF_GE:		printf("IF %s >= %s GOTO %s", arg1, arg2, target); break;
@@ -119,7 +152,7 @@ void printInterCode(InterCode code) {
 	case 	ILOP_IF_L:		printf("IF %s < %s GOTO %s", arg1, arg2, target); break;
 	case 	ILOP_IF_LE:		printf("IF %s <= %s GOTO %s", arg1, arg2, target); break;
 	case 	ILOP_RETURN:	printf("RETURN %s", target); break;
-	case 	ILOP_DEC:		printf("DEC %s [%s]", target, arg1); break;
+	case 	ILOP_DEC:		printf("DEC %s [ %s ]", target, arg1); break;
 	case 	ILOP_ARG:		printf("ARG %s", target); break;
 	case 	ILOP_CALL:		printf("%s := CALL %s", target, arg1); break;
 	case 	ILOP_PARAM:		printf("PARAM %s", target); break;

@@ -10,6 +10,12 @@
 #include "OP.h"
 #include "NameCreator.h"
 
+#define VAR_CONST_OPTMIZATION
+
+#define CONST_VALUE_OPTMIZATION
+
+//#define SUB_EXP_OPTMIZATION
+
 #define AST_MAX_HEIGHT 10
 
 enum ASTNodeType {
@@ -56,6 +62,20 @@ int maxHeight(ASTNode h1, ASTNode h2) {
 	else return 0;
 }
 
+
+int isConstASTNode(ASTNode node) {
+#ifdef CONST_VALUE_OPTMIZATION
+	return node->constValue.type != CONST_NONE;
+#else
+	return 0;
+#endif
+}
+
+ConstValue getConstValue(ASTNode node) {
+	return node->constValue;
+}
+
+
 ListHead getASTNodeList(int height) {
 	return height >= AST_MAX_HEIGHT ? astNodeLists[AST_MAX_HEIGHT] : astNodeLists[height];
 }
@@ -63,6 +83,12 @@ ListHead getASTNodeList(int height) {
 void initAST() {
 	for (int i = 0; i <= AST_MAX_HEIGHT; i++) {
 		astNodeLists[i] = MyList_createList();
+	}
+}
+
+void clearASTOps() {
+	for (int i = 1; i <= AST_MAX_HEIGHT; i++) {
+		MyList_clear(astNodeLists[i]);
 	}
 }
 
@@ -100,10 +126,116 @@ ASTNode findASTNode(int height, ASTNodeType type, ASTNodeValue value, ASTNode lc
 	return res;
 }
 
+ASTNode findASTNode_sym(Sym sym) {
+	ASTNodeValue value;
+	value.sym = sym;
+	return findASTNode(0, AST_SYM, value, NULL, NULL);
+}
+
+ASTNode findASTNode_integer(int v) {
+	ASTNodeValue value;
+	value.intValue = v;
+	return findASTNode(0, AST_INTEGER, value, NULL, NULL);
+}
+
+ASTNode findASTNode_float(float v) {
+	ASTNodeValue value;
+	value.floatValue = v;
+	return findASTNode(0, AST_FLOAT, value, NULL, NULL);
+}
+
+ASTNode findASTNode_op(OP op, ASTNode lc, ASTNode rc) {
+	ASTNodeValue value;
+	value.op = op;
+	return findASTNode(1 + maxHeight(lc, rc), AST_OP, value, lc, rc);
+}
+
 void insertASTNode(ASTNode node) {
 	int height = node->height;
 	ListHead list = getASTNodeList(height);
 	MyList_pushElem(list, node);
+}
+
+char* itostr(int val) {
+	char* intStr = (char*)malloc(sizeof(char) * 40);
+	if (intStr) sprintf(intStr, "#%d", val);
+	return intStr;
+}
+char* ftostr(float val) {
+	char* floatStr = (char*)malloc(sizeof(char) * 40);
+	if (floatStr) sprintf(floatStr, "#%f", val);
+	return floatStr;
+}
+
+
+
+char* getASTNodeStr_r(ASTNode node) {
+#ifdef CONST_VALUE_OPTMIZATION
+	if (isConstASTNode(node)) {
+		switch (node->constValue.type) {
+		case CONST_INTEGER:	return itostr(getConstInt(&node->constValue));
+		case CONST_FLOAT:	return ftostr(getConstFloat(&node->constValue));
+		}
+	}
+#endif
+	return node->name;
+}
+
+char* getASTNodeStr_l(ASTNode node) {
+	char* str = NULL;
+	if (node->type == AST_INTEGER || node->type == AST_FLOAT || node->type == AST_OP || node->type == AST_FUNC) assert(0);
+	else if (node->type == AST_SYM) {
+		str = node->name;
+	}
+	else assert(0);
+	return str;
+}
+
+void clearParents(ASTNode lc) {
+	ListIterator parents_it = MyList_createIterator(lc->parents);
+	while (MyList_hasNext(parents_it)) {
+		ASTNode node = (ASTNode)MyList_getNext(parents_it);
+		ListHead list = getASTNodeList(node->height);
+
+		ListIterator list_it = MyList_createIterator(list);
+		while (MyList_hasNext(list_it)) {
+			ASTNode list_node = (ASTNode)MyList_getNext(list_it);
+
+			if (node == list_node) {
+				clearParents(list_node);
+				MyList_removePrev(list_it);
+				break;
+			}
+		}
+		MyList_destroyIterator(list_it);
+
+	}
+	MyList_destroyIterator(parents_it);
+	MyList_clear(lc->parents);
+}
+
+void calConstValue(OP op, ConstValue* lv, ConstValue* rv, ConstValue* ret_value) {
+	ConstType type = lv->type;
+	ret_value->type = type;
+	if (lv && rv) {
+		if (type == CONST_INTEGER) {
+			assignConstInteger(procOP2_int(op, getConstInt(lv), getConstInt(rv)), ret_value);
+		}
+		else if (type == CONST_FLOAT) {
+			assignConstFloat(procOP2_float(op, getConstFloat(lv), getConstFloat(rv)), ret_value);
+		}
+	}
+	else if (lv) {
+		if (type == CONST_INTEGER) {
+			assignConstInteger(procOP1_int(op, getConstInt(lv)), ret_value);
+		}
+		else if (type == CONST_FLOAT) {
+			assignConstFloat(procOP1_float(op, getConstFloat(rv)), ret_value);
+		}
+	}
+	else {
+		exit(-1);
+	}
 }
 
 ASTNode createASTNode_raw(int height, ASTNodeType type, ASTNodeValue value, char* name, ASTNode lc, ASTNode rc, ListHead parents) {
@@ -117,7 +249,7 @@ ASTNode createASTNode_raw(int height, ASTNodeType type, ASTNodeValue value, char
 		node->rc = rc;
 		node->parents = parents;
 		node->accessTag = 0;
-		node->constValue.type = CONST_NONE;
+		assignConstNone(&node->constValue);
 	}
 	return node;
 }
@@ -166,18 +298,24 @@ ASTNode createASTNode_integer(int v) {
 	ASTNode node = NULL;
 	ASTNodeValue value;
 	value.intValue = v;
+
 	node = findASTNode(0, AST_INTEGER, value, NULL, NULL);
+
 	if (node == NULL){
 		node = createASTNode_raw(
 			0,
 			AST_INTEGER,
 			value,
-			NULL,
+			itostr(v),
 			NULL,
 			NULL,
 			MyList_createList()
 		);
+
+#ifdef CONST_VALUE_OPTMIZATION
 		assignConstInteger(v, &node->constValue);
+#endif
+
 		insertASTNode(node);
 	}
 	return node;
@@ -187,76 +325,27 @@ ASTNode createASTNode_float(float v) {
 	ASTNode node = NULL;
 	ASTNodeValue value;
 	value.floatValue = v;
+
 	node = findASTNode(0, AST_FLOAT, value, NULL, NULL);
+
 	if (node == NULL){
 		node = createASTNode_raw(
 			0,
 			AST_FLOAT,
 			value,
-			NULL,
+			ftostr(v),
 			NULL,
 			NULL,
 			MyList_createList()
 		);
+
+#ifdef CONST_VALUE_OPTMIZATION
 		assignConstFloat(v, &node->constValue);
+#endif
+
 		insertASTNode(node);
 	}
 	return node;
-}
-
-void clearParents(ASTNode lc) {
-	ListIterator parents_it = MyList_createIterator(lc->parents);
-	while (MyList_hasNext(parents_it)) {
-		ASTNode node = (ASTNode)MyList_getNext(parents_it);
-		ListHead list = getASTNodeList(node->height);
-
-		ListIterator list_it = MyList_createIterator(list);
-		while (MyList_hasNext(list_it)) {
-			ASTNode list_node = (ASTNode)MyList_getNext(list_it);
-
-			if (node == list_node) {
-				clearParents(list_node);
-				MyList_removePrev(list_it);
-				break;
-			}
-		}
-		MyList_destroyIterator(list_it);
-
-	}
-	MyList_destroyIterator(parents_it);
-	MyList_clear(lc->parents);
-}
-
-int isConstASTNode(ASTNode node) {
-	return node->constValue.type != CONST_NONE;
-}
-
-ConstValue getConstValue(ASTNode node) {
-	return node->constValue;
-}
-
-void calConstValue(OP op, ConstValue* lv, ConstValue* rv, ConstValue* ret_value) {
-	ConstType type = lv->type;
-	ret_value->type = type;
-	if (lv && rv) {
-		if (type == CONST_INTEGER) {
-			assignConstInteger(procOP2_int(op, getConstInt(lv), getConstInt(rv)), ret_value);
-		}
-		else if (type == CONST_FLOAT) {
-			assignConstFloat(procOP2_float(op, getConstFloat(lv), getConstFloat(rv)), ret_value);
-		}
-	}
-	else if (lv) {
-		if (type == CONST_INTEGER) {
-			assignConstInteger(procOP1_int(op, getConstInt(lv)), ret_value);
-		}
-		else if (type == CONST_FLOAT) {
-			assignConstFloat(procOP1_float(op, getConstFloat(rv)), ret_value);
-		}
-	}
-	else {
-		exit(-1);
-	}
 }
 
 ASTNode createASTNode_op(OP op, ASTNode lc, ASTNode rc) {
@@ -267,70 +356,50 @@ ASTNode createASTNode_op(OP op, ASTNode lc, ASTNode rc) {
 		clearParents(lc);
 	}
 
+#ifdef SUB_EXP_OPTMIZATION
 	node = findASTNode(maxHeight(lc, rc) + 1, AST_OP, value, lc, rc);
+#endif
 
 	if (node == NULL) {
 		node = createASTNode_raw(
 			maxHeight(lc, rc) + 1,
 			AST_OP,
 			value,
-			op == OP_ASSIGN ? rc->name : createName_temp(),
+			op == OP_ASSIGN ? getASTNodeStr_r(rc) :
+			op == OP_DEREF ? concatStr("*", getASTNodeStr_l(lc)):
+			createName_temp(),
 			lc,
 			rc,
 			MyList_createList()
 		);
 
-		if (op == OP_ASSIGN && isConstASTNode(rc)) {
-			assignConstValue(&rc->constValue, &lc->constValue);
+#ifdef CONST_VALUE_OPTMIZATION
+		if (op == OP_ASSIGN) {
+			if (isConstASTNode(rc)) {
+				assignConstValue(&rc->constValue, &node->constValue);
+
+#ifdef VAR_CONST_OPTMIZATION
+				assignConstValue(&rc->constValue, &lc->constValue);
+#endif
+			}
+			else {
+				assignConstNone(&lc->constValue);
+				assignConstNone(&node->constValue);
+			}
 		}
-		else if (lc && rc && isConstASTNode(lc) && isConstASTNode(rc)) {
+		else if (lc && rc && isAlgorithmOp(op) && isConstASTNode(lc) && isConstASTNode(rc)) {
 			calConstValue(op, &lc->constValue, &rc->constValue, &node->constValue);
 		}
-		else if (lc && rc == 0 && isConstASTNode(rc)) {
+		else if (lc && rc == 0 && isAlgorithmOp(op) && isConstASTNode(rc)) {
 			calConstValue(op, &lc->constValue, NULL, &node->constValue);
-		}
+		} 
+#endif
 
 		if (lc) MyList_pushElem(lc->parents, node);
 		if (rc && rc != lc) MyList_pushElem(rc->parents, node);
 		insertASTNode(node);
 	}
 	return node;
-}
-
-
-char* itostr(int val) {
-	char* intStr = (char*)malloc(sizeof(char) * 40);
-	if (intStr) sprintf(intStr, "#%d", val);
-	return intStr;
-}
-char* ftostr(float val) {
-	char* floatStr = (char*)malloc(sizeof(char) * 40);
-	if (floatStr) sprintf(floatStr, "#%f", val);
-	return floatStr;
-}
-
-
-
-char* getASTNodeStr_r(ASTNode node) {
-	char* str = NULL;
-	if (isConstASTNode(node)) {
-		switch (node->constValue.type) {
-		case CONST_INTEGER: str = itostr(getConstInt(&node->constValue)); break;
-		case CONST_FLOAT:	str = ftostr(getConstFloat(&node->constValue)); break;
-		}
-	}
-	else str = node->name;
-	return str;
-}
-
-char* getASTNodeStr_l(ASTNode node) {
-	char* str = NULL;
-	if (node->type == AST_INTEGER || node->type == AST_FLOAT || node->type == AST_OP || node->type == AST_FUNC) assert(0);
-	else if (node->type == AST_SYM) {
-		str = node->name;
-	}
-	else assert(0);
-	return str;
 }
 
 int astIndent = -1;

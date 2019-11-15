@@ -7,6 +7,7 @@
 #include "AbstractSyntaxTree.h"
 #include "OP.h"
 #include "IntermediateLanguage.h"
+#include "TranslateASTTree.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -176,7 +177,7 @@ void SM_OptTag(Node node, char** ret_name);
 void SM_Tag(Node node, char** ret_name);
 void SM_VarDec(Node node, Type type, Sym* ret_var, ASTNode* ret_astNode);
 void SM_FunDec(Node node, Type specType, int isDef);
-void SM_VarList(Node node, ListHead ret_list, ListHead ret_astNodeList);
+void SM_VarList(Node node, ListHead ret_list);
 void SM_ParamDec(Node node, Sym* ret_var, ASTNode* ret_astNode);
 void SM_CompSt(Node node, Type returnType, ListHead nextList);
 void SM_StmtList(Node node, Type returnType, ListHead nextList);
@@ -242,11 +243,12 @@ void SM_ExtDef(Node node) {
 		Node compStNode = node->child[2];
 		Type specType = NULL;
 		ListHead nextList = MyList_createList();
+		clearASTOps();
 		SM_Specifier(specifierNode, &specType);
 		SM_FunDec(funDecNode, specType, 1);
 		SM_CompSt(compStNode, specType, nextList);
 		
-		if (MyList_isEmpty(nextList) != 0) {
+		if (MyList_isEmpty(nextList) == 0) {
 			char* label = createName_label();
 			backpatchCode(nextList, label);
 			appendInterCode(createInterCode(NULL, NULL, label, ILOP_LABEL));
@@ -376,9 +378,11 @@ void SM_VarDec(Node node, Type type, Sym* ret_var, ASTNode* ret_astNode) {
 		Sym sym = createSym(name, type);
 		ASTNode astNode = createASTNode_sym(sym);
 
-		char size[50];
-		sprintf(size, "%d", sym->type->size);
-		appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(astNode), ILOP_DEC));
+		char* size = (char*)malloc(sizeof(char) * 10);
+		if (size) {
+			sprintf(size, "%d", sym->type->size);
+			appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(astNode), ILOP_DEC));
+		}
 
 		if (ret_var)* ret_var = sym;
 		if (ret_astNode)* ret_astNode = astNode;
@@ -401,12 +405,11 @@ void SM_FunDec(Node node, Type specType, int isDef) {
 #endif
 	char* name = NULL;
 	ListHead paramList = MyList_createList();
-	ListHead astNodeList = MyList_createList();
 	if (node->expandNo == 1) {// ID LP VarList RP
 		Node idNode = node->child[0];
 		Node varListNode = node->child[2];
 		name = idNode->str_val;
-		SM_VarList(varListNode, paramList, astNodeList);
+		SM_VarList(varListNode, paramList);
 	}
 	else if (node->expandNo == 2) {// ID LP RP
 		Node idNode = node->child[0];
@@ -419,14 +422,6 @@ void SM_FunDec(Node node, Type specType, int isDef) {
 			func = createFunc(name, paramList, specType);
 			insertFunc(getCurFuncTable(), func);
 			declareFunc(func, node->lineno);
-
-			ListIterator it = MyList_createIterator(astNodeList);
-			while (MyList_hasNext(it)) {
-				ASTNode node = (ASTNode)MyList_getNext(it);
-				appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_l(node), ILOP_PARAM));
-			}
-			MyList_destroyIterator(it);
-			MyList_destroyList(astNodeList);
 
 			appendInterCode(createInterCode(NULL, NULL, func->name, ILOP_FUNCTION));
 		}
@@ -445,7 +440,7 @@ void SM_FunDec(Node node, Type specType, int isDef) {
 #endif
 }
 
-void SM_VarList(Node node, ListHead ret_symList, ListHead ret_astNodeList) {
+void SM_VarList(Node node, ListHead ret_symList) {
 #ifdef TEST_MODE
 	testEnterPrint(node);
 #endif
@@ -454,21 +449,24 @@ void SM_VarList(Node node, ListHead ret_symList, ListHead ret_astNodeList) {
 		Node varListNode = node->child[2];
 		Sym sym = NULL;
 		ASTNode astNode = NULL;
+
 		SM_ParamDec(paramDecNode, &sym, &astNode);
 
-		if (ret_symList) MyList_pushElem(ret_symList, sym);
-		if (ret_astNodeList) MyList_pushElem(ret_astNodeList, astNode);
+		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_l(astNode), ILOP_PARAM));
 
-		SM_VarList(varListNode, ret_symList, ret_astNodeList);
+		if (ret_symList) MyList_pushElem(ret_symList, sym);
+		SM_VarList(varListNode, ret_symList);
 	}
 	else if (node->expandNo == 2){ //ParamDec
 		Node paramDecNode = node->child[0];
 		Sym sym = NULL;
 		ASTNode astNode = NULL;
+
 		SM_ParamDec(paramDecNode, &sym, &astNode);
 
+		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_l(astNode), ILOP_PARAM));
+
 		if (ret_symList) MyList_pushElem(ret_symList, sym);
-		if (ret_astNodeList) MyList_pushElem(ret_astNodeList, astNode);
 	}
 #ifdef TEST_MODE
 	testExitPrint(node);
@@ -523,7 +521,7 @@ void SM_StmtList(Node node, Type returnType, ListHead nextList) {
 		SM_Stmt(stmtNode, returnType, tmpNextList);
 
 		
-		if (MyList_isEmpty(tmpNextList) != 0) {
+		if (MyList_isEmpty(tmpNextList) == 0) {
 			char* label = createName_label();
 			backpatchCode(tmpNextList, label);
 			appendInterCode(createInterCode(NULL, NULL, label, ILOP_LABEL));
@@ -695,7 +693,9 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		ASTNode astNode2 = NULL;
 		SM_Exp(expNode1, &astNode1, NULL, NULL, 0, 0);
 		SM_Exp(expNode2, &astNode2, NULL, NULL, 0, 0);
-		if (ret_astNode)* ret_astNode = createASTNode_op(OP_ASSIGN, astNode1, astNode2);
+
+		ASTNode resNode = createASTNode_op(OP_ASSIGN, astNode1, astNode2);
+		if (ret_astNode)* ret_astNode = resNode;
 		appendInterCode(createInterCode(getASTNodeStr_r(astNode2), NULL, getASTNodeStr_l(astNode1), ILOP_ASSIGN));
 	}
 	else if (node->expandNo == 2) {// Exp AND Exp
@@ -703,11 +703,11 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		Node expNode2 = node->child[2];
 		ASTNode astNode1 = NULL;
 		ASTNode astNode2 = NULL;
-
 		ListHead tmpTrueList = MyList_createList();
+
 		SM_Exp(expNode1, &astNode1, tmpTrueList, falseList, 1, 0);
 
-		if (MyList_isEmpty(tmpTrueList) != 0) {
+		if (MyList_isEmpty(tmpTrueList) == 0) {
 			char* label = createName_label();
 			backpatchCode(tmpTrueList, label);
 			appendInterCode(createInterCode(NULL, NULL, label, ILOP_LABEL));
@@ -728,7 +728,7 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		ListHead tmpFalseList = MyList_createList();
 		SM_Exp(expNode1, &astNode1, trueList, tmpFalseList, 0, 1);
 
-		if (MyList_isEmpty(tmpFalseList) != 0) {
+		if (MyList_isEmpty(tmpFalseList) == 0) {
 			char* label = createName_label();
 			appendInterCode(createInterCode(NULL, NULL, label, ILOP_LABEL));
 			backpatchCode(tmpFalseList, createName_label());
@@ -806,9 +806,11 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		ASTNode astNode2 = NULL;
 		SM_Exp(expNode1, &astNode1, NULL, NULL, 0, 0);
 		SM_Exp(expNode2, &astNode2, NULL, NULL, 0, 0);
+		int nodeExist = findASTNode_op(op, astNode1, astNode2) ? 1 : 0;
 		ASTNode resNode = createASTNode_op(op, astNode1, astNode2);
 		if(ret_astNode)*ret_astNode = resNode;
-		if (isConstASTNode(resNode) == 0) {
+
+		if (nodeExist == 0 && isConstASTNode(resNode) == 0) {
 			ILOP ilop = getAlgorithmOP(op);
 			InterCode code = createInterCode(getASTNodeStr_r(astNode1), getASTNodeStr_r(astNode2), getASTNodeStr_r(resNode), ilop);
 			appendInterCode(code);
@@ -822,10 +824,11 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		Node expNode = node->child[1];
 		ASTNode astNode = NULL;
 		SM_Exp(expNode, &astNode, NULL, NULL, 0, 0);
+		int nodeExist = findASTNode_op(OP_NEG, astNode, NULL) ? 1 : 0;
 		ASTNode resNode = createASTNode_op(OP_NEG, astNode, NULL);
 		if (ret_astNode)* ret_astNode = resNode;
 		
-		if (isConstASTNode(resNode) == 0) {
+		if (nodeExist == 0 && isConstASTNode(resNode) == 0) {
 			InterCode code = createInterCode("0", getASTNodeStr_r(astNode), getASTNodeStr_l(resNode), ILOP_MINUS);
 			appendInterCode(code);
 		}
@@ -848,14 +851,6 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		
 		ASTNode resNode = createASTNode_func(func);
 		if (ret_astNode)* ret_astNode = resNode;
-
-		ListIterator it = MyList_createIterator(argList);
-		while (MyList_hasNext(it)) {
-			ASTNode node = (ASTNode)MyList_getNext(it);
-			InterCode code = createInterCode(NULL, NULL, getASTNodeStr_r(node), ILOP_ARG);
-			appendInterCode(code);
-		}
-		MyList_destroyIterator(it);
 
 		InterCode code = createInterCode(func->name, NULL, getASTNodeStr_l(resNode), ILOP_CALL);
 		appendInterCode(code);
@@ -882,7 +877,29 @@ void SM_Exp(Node node, ASTNode* ret_astNode, ListHead trueList, ListHead falseLi
 		Node expNode = node->child[0];
 		Node idNode = node->child[2];
 		char* name = idNode->str_val;
-		//TODO:
+		Sym structSym = findSym_all(name);
+		Sym fieldSym = NULL;
+
+		ListIterator it = MyList_createIterator(structSym->type->u.fieldList);
+		while (MyList_hasNext(it)) {
+			Sym sym = (Sym)MyList_getNext(it);
+			if (strcmp(sym->name, name) == 0) {
+				fieldSym = sym;
+				break;
+			}
+		}
+		MyList_destroyIterator(it);
+
+		if (fieldSym == NULL) assert(0);
+		int offset = fieldSym->offset;
+		ASTNode structSymNode = createASTNode_sym(structSym);
+		ASTNode refNode = createASTNode_op(OP_REF, structSymNode, NULL);
+		ASTNode offsetNode = createASTNode_integer(offset);
+		ASTNode addNode = createASTNode_op(OP_PLUS, refNode, offsetNode);
+		ASTNode derefNode = createASTNode_op(OP_DEREF, addNode, NULL);
+
+		translateASTTree(derefNode);
+		if (ret_astNode)* ret_astNode = derefNode;
 	}
 	else if (node->expandNo == 16) {// ID
 		Node idNode = node->child[0];
@@ -918,15 +935,20 @@ void SM_Args(Node node, ListHead ret_list) {
 
 		ASTNode astNode = NULL;
 		SM_Exp(expNode, &astNode, NULL, NULL, 0, 0);
-		MyList_pushElem(ret_list, astNode);
+
+		MyList_pushElem(ret_list, astNode->value.sym);
+
 		SM_Args(argsNode, ret_list);
+
+		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_r(astNode), ILOP_ARG));
 	}
 	else if (node->expandNo == 2) {// Exp
 		Node expNode = node->child[0];
 		
 		ASTNode astNode = NULL;
 		SM_Exp(expNode, &astNode, NULL, NULL, 0, 0);
-		MyList_pushElem(ret_list, astNode);
+		MyList_pushElem(ret_list, astNode->value.sym);
+		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_r(astNode), ILOP_ARG));
 	}
 #ifdef TEST_MODE
 	testExitPrint(node);
