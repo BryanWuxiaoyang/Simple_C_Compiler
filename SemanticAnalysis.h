@@ -551,6 +551,8 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 	if (node->expandNo == 1) {// Exp SEMI
 		Node expNode = node->child[0];
 		SM_Exp(expNode, NULL, NULL, NULL, 0, 0);
+		printf("line %d\n", node->lineno);
+		printASTNodes();
 	}
 	else if (node->expandNo == 2) {// CompSt
 		Node compStNode = node->child[0];
@@ -751,7 +753,8 @@ void SM_Dec(Node node, Type specType, Sym* ret_var) {
 		ASTNode astNode2 = NULL;
 		SM_VarDec(varDecNode, specType, ret_var, &astNode1);
 		SM_Exp(expNode, &astNode2, NULL, NULL, 0, 0);
-
+		createASTNode_op(OP_ASSIGN, astNode1, astNode2);
+		
 		char* size = (char*)malloc(sizeof(char) * 10);
 		if (size) {
 			sprintf(size, "%d", (*ret_var)->type->size);
