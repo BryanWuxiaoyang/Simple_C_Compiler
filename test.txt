@@ -1,7 +1,7 @@
 int main(float a){
     int b = 2, c;
-    b = c + 1;
     c = c + 1;
+    b = c + 1;
     if(b > c){
         c = 2;
     }
