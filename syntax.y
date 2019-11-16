@@ -3,6 +3,7 @@
     #include <string.h>
     #include "lex.yy.c"
     #include "SemanticAnalysis.h"
+    #include "IntermediateLanguage.h"
     void yyerror(char* msg);
     Node nodeBuffer[8];
     void errorTypeB(int lineno,int errorId){
@@ -394,6 +395,7 @@ int main(int argc,char** argv){
         //printTree(nodeBuffer[0],0);
         printf("Syntax OK!\n");
         semAnalysis(nodeBuffer[0]);
+        printInterCodeList(NULL, NULL);
 		//FILE* file = fopen("tree.txt", "w");
 		//putSyntaxTreeToFile(file, nodeBuffer[0]);
 		//fclose(file);

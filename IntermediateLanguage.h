@@ -64,7 +64,7 @@ struct _InterCode_ {
 };
 typedef struct _InterCode_* InterCode;
 
-void printInterCode(InterCode code);
+void printInterCode(InterCode code, FILE* file, char* buffer);
 
 InterCode createInterCode(const char* arg1,const char* arg2, const char* target, ILOP op) {
 	InterCode code = (InterCode)malloc(sizeof(struct _InterCode_));

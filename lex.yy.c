@@ -1007,7 +1007,7 @@ YY_RULE_SETUP
 case 23:
 YY_RULE_SETUP
 #line 129 "lexical.l"
-{yylval=createNode(0,NULL,0,SYN_OP,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB)  {yylval->op = OP_MINUS; last_unit=MINUS;   return(MINUS);}   else{yylval->op = OP_NEG; last_unit=NEG;  return(NEG); }     }
+{yylval=createNode(0,NULL,0,SYN_OP,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB||last_unit==ID)  {yylval->op = OP_MINUS; last_unit=MINUS;   return(MINUS);}   else{yylval->op = OP_NEG; last_unit=NEG;  return(NEG); }     }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
