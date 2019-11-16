@@ -317,6 +317,7 @@ Exp:Exp ASSIGNOP Exp{
         nodeBuffer[1]=$2; 
         nodeBuffer[2]=$3; 
         $$=createNode(3,nodeBuffer,9,Exp,@$.first_line);
+        printf("brackets\n");
     }|  NEG Exp{
         nodeBuffer[0]=$1; 
         nodeBuffer[1]=$2; 
@@ -361,7 +362,9 @@ Exp:Exp ASSIGNOP Exp{
         errorTypeB(@$.first_line, 5);
     }|  Exp LB error RB{
         errorTypeB(@$.first_line, 21);
+        printf("err2\n");
     }|  Exp LB Exp error{
+        printf("err1\n");
         errorTypeB(@$.first_line, 21);
     };
 Args:Exp COMMA Args {
