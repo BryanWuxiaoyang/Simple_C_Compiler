@@ -317,7 +317,6 @@ Exp:Exp ASSIGNOP Exp{
         nodeBuffer[1]=$2; 
         nodeBuffer[2]=$3; 
         $$=createNode(3,nodeBuffer,9,Exp,@$.first_line);
-        printf("brackets\n");
     }|  NEG Exp{
         nodeBuffer[0]=$1; 
         nodeBuffer[1]=$2; 
