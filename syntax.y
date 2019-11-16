@@ -361,9 +361,7 @@ Exp:Exp ASSIGNOP Exp{
         errorTypeB(@$.first_line, 5);
     }|  Exp LB error RB{
         errorTypeB(@$.first_line, 21);
-        printf("err2\n");
     }|  Exp LB Exp error{
-        printf("err1\n");
         errorTypeB(@$.first_line, 21);
     };
 Args:Exp COMMA Args {
@@ -395,10 +393,10 @@ int main(int argc,char** argv){
     if(ok){
         //printTree(nodeBuffer[0],0);
         printf("Syntax OK!\n");
-        //semAnalysis(nodeBuffer[0]);
-		FILE* file = fopen("tree.txt", "w");
-		putSyntaxTreeToFile(file, nodeBuffer[0]);
-		fclose(file);
+        semAnalysis(nodeBuffer[0]);
+		//FILE* file = fopen("tree.txt", "w");
+		//putSyntaxTreeToFile(file, nodeBuffer[0]);
+		//fclose(file);
     }
     return 0;
 }

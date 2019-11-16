@@ -10,3 +10,6 @@ struct _Func_ {
 	int defLineno;
 };
 typedef struct _Func_* Func;
+
+Func readFunc;
+Func writeFunc;

@@ -1,6 +1,7 @@
 #pragma once
 #include "SymTable.h"
 #include "Func.h"
+#include "Type.h"
 
 struct _FuncTable_ {
 	ListHead head;
@@ -16,10 +17,6 @@ FuncTable createFuncTable() {
 }
 
 FuncTable funcTable;
-
-void initFuncTable(){
-	funcTable = createFuncTable();
-}
 
 FuncTable getCurFuncTable() {
 	return funcTable;
@@ -57,16 +54,16 @@ void fillFunc(Func func, const char* name, ListHead paramList, Type returnType) 
 }
 
 Func findFunc(FuncTable table, const char* name) {
-	ListIterator it = MyList_createIterator(table->head);
+	ListIterator handlerIt = MyList_createIterator(table->head);
 	Func res = NULL;
-	while (MyList_hasNext(it)) {
-		Func sym = (Func)MyList_getNext(it);
+	while (MyList_hasNext(handlerIt)) {
+		Func sym = (Func)MyList_getNext(handlerIt);
 		if (strcmp(sym->name, name) == 0) {
 			res = sym;
 			break;
 		}
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 	return res;
 }
 
@@ -98,11 +95,25 @@ int isDefinedFunc(Func func) {
 	else return 0;
 }
 
+void initFuncTable() {
+	ListHead readParamList = MyList_createList();
+	ListHead writeParamList = MyList_createList();
+	Sym writeSym = createSym("writeParam", integerType);
+	MyList_pushElem(writeParamList, writeSym);
+
+	readFunc = createFunc("read", readParamList, integerType);
+	writeFunc = createFunc("write", writeParamList, integerType);
+
+	funcTable = createFuncTable();
+	insertFunc(funcTable, readFunc);
+	insertFunc(funcTable, writeFunc);
+}
+
 void printFuncTable() {
 	printf("func table:\n");
-	ListIterator it = MyList_createIterator(funcTable->head);
-	while (MyList_hasNext(it)) {
-		Func func = (Func)MyList_getNext(it);
+	ListIterator handlerIt = MyList_createIterator(funcTable->head);
+	while (MyList_hasNext(handlerIt)) {
+		Func func = (Func)MyList_getNext(handlerIt);
 		printf("\tname %s, return type %s, param list:\n", func->name, func->returnType->name);
 		ListIterator it2 = MyList_createIterator(func->paramList);
 		while (MyList_hasNext(it2)) {
@@ -111,5 +122,5 @@ void printFuncTable() {
 		}
 		MyList_destroyIterator(it2);
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 }

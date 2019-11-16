@@ -38,6 +38,7 @@ void assignConstValue(ConstValue* src, ConstValue* dst) {
 	switch (src->type) {
 	case CONST_INTEGER: assignConstInteger(src->v.constInteger, dst); break;
 	case CONST_FLOAT:	assignConstFloat(src->v.constFloat, dst); break;
+	case CONST_NONE:	assignConstNone(dst);	break;
 	default:			assert(0);
 	}
 }
@@ -56,4 +57,17 @@ char* concatStr(const char* str1, const char* str2) {
 	char* str = (char*)malloc(sizeof(char) * (strlen(str1) + strlen(str2) + 2));
 	if(str) sprintf(str, "%s%s", str1, str2);
 	return str;
+}
+
+int isEqualConstValue(ConstValue v1, ConstValue v2) {
+	if (v1.type != v2.type) return 0;
+	else {
+		switch (v1.type) {
+		case CONST_INTEGER:	return v1.v.constInteger == v2.v.constInteger;
+		case CONST_FLOAT:	return v1.v.constFloat == v2.v.constFloat;
+		case CONST_NONE:	return	1;
+		}
+	}
+	assert(0);
+	return 0;
 }

@@ -80,7 +80,7 @@ InterCode createInterCode(const char* arg1,const char* arg2, const char* target,
 ListHead interCodeList;
 
 struct _CodeIterator_ {
-	ListIterator it;
+	ListIterator handlerIt;
 };
 typedef struct _CodeIterator_* CodeIterator;
 
@@ -89,19 +89,19 @@ void initIL(){
 }
 
 CodeIterator createCodeIterator() {
-	CodeIterator it = (CodeIterator)malloc(sizeof(struct _CodeIterator_));
-	if (it) {
-		it->it = MyList_createIterator(interCodeList);
+	CodeIterator handlerIt = (CodeIterator)malloc(sizeof(struct _CodeIterator_));
+	if (handlerIt) {
+		handlerIt->handlerIt = MyList_createIterator(interCodeList);
 	}
-	return it;
+	return handlerIt;
 }
 
-int hasNextCode(CodeIterator it) {
-	return MyList_hasNext(it->it);
+int hasNextCode(CodeIterator handlerIt) {
+	return MyList_hasNext(handlerIt->handlerIt);
 }
 
-InterCode getNextCode(CodeIterator it) {
-	return (InterCode)MyList_getNext(it->it);
+InterCode getNextCode(CodeIterator handlerIt) {
+	return (InterCode)MyList_getNext(handlerIt->handlerIt);
 }
 
 ListHead getInterCodeList() {
@@ -110,66 +110,94 @@ ListHead getInterCodeList() {
 
 void appendInterCode(InterCode code) {
 	MyList_pushElem(interCodeList, code);
-	printInterCode(code);
 }
 
-void insertInterCode(CodeIterator it, InterCode code) {
-	MyList_insert(it->it, code);
+void insertInterCode(CodeIterator handlerIt, InterCode code) {
+	MyList_insert(handlerIt->handlerIt, code);
 }
 
-InterCode removeInterCode_prev(CodeIterator it) {
-	return (InterCode)MyList_removePrev(it->it);
+InterCode removeInterCode_prev(CodeIterator handlerIt) {
+	return (InterCode)MyList_removePrev(handlerIt->handlerIt);
 }
 
-InterCode removeInterCode_next(CodeIterator it) {
-	return (InterCode)MyList_removeNext(it->it);
+InterCode removeInterCode_next(CodeIterator handlerIt) {
+	return (InterCode)MyList_removeNext(handlerIt->handlerIt);
 }
 
-void backpatchCode(ListHead codeList, char* label) {
-	ListIterator it = MyList_createIterator(codeList);
-	while (MyList_hasNext(it)) {
-		InterCode code = (InterCode)MyList_getNext(it);
+void backpatchCode(ListHead codeList, const char* label) {
+	ListIterator handlerIt = MyList_createIterator(codeList);
+	while (MyList_hasNext(handlerIt)) {
+		InterCode code = (InterCode)MyList_getNext(handlerIt);
 		code->target = label;
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 }
 
-void printInterCode(InterCode code) {
+InterCode getLastCode() {
+	return (InterCode)MyList_getBack(interCodeList);
+}
+
+int removeCode(InterCode code) {
+	int suc = 0;
+	ListIterator it = MyList_createIterator(getInterCodeList());
+	while (MyList_hasNext(it)) {
+		InterCode code2 = (InterCode)MyList_getNext(it);
+		if (code == code2) {
+			MyList_removePrev(it);
+			suc = 1;
+			break;
+		}
+	}
+	MyList_destroyIterator(it);
+	return suc;
+}
+
+void printInterCode(InterCode code, FILE* file, char* buffer) {
 	const char* arg1 = code->arg1;
 	const char* arg2 = code->arg2;
 	const char* target = code->target;
+	char buf[100];
 	switch (code->op) {
-	case	ILOP_LABEL:		printf("LABEL %s :", target); break;
-	case 	ILOP_FUNCTION:	printf("FUNCTION %s :", target); break;
-	case 	ILOP_ASSIGN:	printf("%s := %s", target, arg1); break;
-	case 	ILOP_PLUS:		printf("%s := %s + %s", target, arg1, arg2); break;
-	case 	ILOP_MINUS:		printf("%s := %s - %s", target, arg1, arg2); break;
-	case 	ILOP_MUL:		printf("%s := %s * %s", target, arg1, arg2); break;
-	case 	ILOP_DIV:		printf("%s := %s / %s", target, arg1, arg2); break;
-	case 	ILOP_ADDR:		printf("%s := &%s", target, arg1); break;
-	case 	ILOP_GOTO:		printf("GOTO %s", target); break;
-	case 	ILOP_IF_G:		printf("IF %s > %s GOTO %s", arg1, arg2, target); break;
-	case 	ILOP_IF_GE:		printf("IF %s >= %s GOTO %s", arg1, arg2, target); break;
-	case 	ILOP_IF_E:		printf("IF %s == %s GOTO %s", arg1, arg2, target); break;
-	case 	ILOP_IF_NE:		printf("IF %s != %s GOTO %s", arg1, arg2, target); break;
-	case 	ILOP_IF_L:		printf("IF %s < %s GOTO %s", arg1, arg2, target); break;
-	case 	ILOP_IF_LE:		printf("IF %s <= %s GOTO %s", arg1, arg2, target); break;
-	case 	ILOP_RETURN:	printf("RETURN %s", target); break;
-	case 	ILOP_DEC:		printf("DEC %s [ %s ]", target, arg1); break;
-	case 	ILOP_ARG:		printf("ARG %s", target); break;
-	case 	ILOP_CALL:		printf("%s := CALL %s", target, arg1); break;
-	case 	ILOP_PARAM:		printf("PARAM %s", target); break;
-	case 	ILOP_READ:		printf("READ %s", target); break;
-	case 	ILOP_WRITE:		printf("WRITE %s", target); break;
+	case	ILOP_LABEL:		sprintf(buf, "LABEL %s :", target); break;
+	case 	ILOP_FUNCTION:	sprintf(buf, "FUNCTION %s :", target); break;
+	case 	ILOP_ASSIGN:	sprintf(buf, "%s := %s", target, arg1); break;
+	case 	ILOP_PLUS:		sprintf(buf, "%s := %s + %s", target, arg1, arg2); break;
+	case 	ILOP_MINUS:		sprintf(buf, "%s := %s - %s", target, arg1, arg2); break;
+	case 	ILOP_MUL:		sprintf(buf, "%s := %s * %s", target, arg1, arg2); break;
+	case 	ILOP_DIV:		sprintf(buf, "%s := %s / %s", target, arg1, arg2); break;
+	case 	ILOP_ADDR:		sprintf(buf, "%s := &%s", target, arg1); break;
+	case 	ILOP_GOTO:		sprintf(buf, "GOTO %s", target); break;
+	case 	ILOP_IF_G:		sprintf(buf, "IF %s > %s GOTO %s", arg1, arg2, target); break;
+	case 	ILOP_IF_GE:		sprintf(buf, "IF %s >= %s GOTO %s", arg1, arg2, target); break;
+	case 	ILOP_IF_E:		sprintf(buf, "IF %s == %s GOTO %s", arg1, arg2, target); break;
+	case 	ILOP_IF_NE:		sprintf(buf, "IF %s != %s GOTO %s", arg1, arg2, target); break;
+	case 	ILOP_IF_L:		sprintf(buf, "IF %s < %s GOTO %s", arg1, arg2, target); break;
+	case 	ILOP_IF_LE:		sprintf(buf, "IF %s <= %s GOTO %s", arg1, arg2, target); break;
+	case 	ILOP_RETURN:	sprintf(buf, "RETURN %s", target); break;
+	case 	ILOP_DEC:		sprintf(buf, "DEC %s %s", target, arg1); break;
+	case 	ILOP_ARG:		sprintf(buf, "ARG %s", target); break;
+	case 	ILOP_CALL:		sprintf(buf, "%s := CALL %s", target, arg1); break;
+	case 	ILOP_PARAM:		sprintf(buf, "PARAM %s", target); break;
+	case 	ILOP_READ:		sprintf(buf, "READ %s", target); break;
+	case 	ILOP_WRITE:		sprintf(buf, "WRITE %s", target); break;
 	}
-	printf("\n");
+
+	if (file) {
+		fprintf(file, "%s\n", buf);
+	}
+	else if (buffer) {
+		sprintf(buffer, "%s\n", buf);
+	}
+	else {
+		printf("%s\n", buf);
+	}
 }
 
-void printInterCodeList() {
-	ListIterator it = MyList_createIterator(interCodeList);
-	while (MyList_hasNext(it)) {
-		InterCode code = (InterCode)MyList_getNext(it);
-		printInterCode(code);
+void printInterCodeList(FILE* file, char* buffer) {
+	ListIterator handlerIt = MyList_createIterator(interCodeList);
+	while (MyList_hasNext(handlerIt)) {
+		InterCode code = (InterCode)MyList_getNext(handlerIt);
+		printInterCode(code, file, buffer);
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 }

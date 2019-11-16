@@ -6,7 +6,7 @@ int main() {
 	Node node = getSyntaxTreeFromFile(file);
 	semAnalysis(node);
 	fclose(file);
-	printTables();
-	printInterCodeList();
+	//printTables();
+	printInterCodeList(NULL, NULL);
 	return 0;
 }

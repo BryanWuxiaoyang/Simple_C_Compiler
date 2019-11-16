@@ -36,9 +36,9 @@ void pushTypeTable(TypeTable table) {
 
 TypeTable popTypeTable() {
 	TypeTable table = (TypeTable)MyList_pop(typeTableList);
-	ListIterator it = MyList_createReverseIterator(typeTableList);
-	curTypeTable = (TypeTable)MyList_getPrev(it);
-	MyList_destroyIterator(it);
+	ListIterator handlerIt = MyList_createReverseIterator(typeTableList);
+	curTypeTable = (TypeTable)MyList_getPrev(handlerIt);
+	MyList_destroyIterator(handlerIt);
 	return table;
 }
 
@@ -51,28 +51,28 @@ TypeTable getGlobalTypeTable() {
 }
 
 Type findType(TypeTable table, const char* name) {
-	ListIterator it = MyList_createIterator(table->head);
+	ListIterator handlerIt = MyList_createIterator(table->head);
 	Type res = NULL;
-	while (MyList_hasNext(it)) {
-		Type type = (Type)MyList_getNext(it);
+	while (MyList_hasNext(handlerIt)) {
+		Type type = (Type)MyList_getNext(handlerIt);
 		if (strcmp(type->name, name) == 0) {
 			res = type;
 			break;
 		}
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 	return res;
 }
 
 Type findType_all(const char* name) {
-	ListIterator it = MyList_createReverseIterator(typeTableList);
+	ListIterator handlerIt = MyList_createReverseIterator(typeTableList);
 	Type res = NULL;
-	while (MyList_hasPrev(it)) {
-		TypeTable table = (TypeTable)MyList_getPrev(it);
+	while (MyList_hasPrev(handlerIt)) {
+		TypeTable table = (TypeTable)MyList_getPrev(handlerIt);
 		res = findType(table, name);
 		if (res) break;
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 	return res;
 }
 
@@ -97,14 +97,14 @@ void fillType_structure(Type type, const char* name, ListHead fieldList) {
 	strcpy(type->name, name);
 	type->kind = STRUCTURE;
 	type->u.fieldList = fieldList;
-	ListIterator it = MyList_createIterator(fieldList);
+	ListIterator handlerIt = MyList_createIterator(fieldList);
 	int offset = 0;
-	while (MyList_hasNext(it)) {
-		Sym sym = (Sym)MyList_getNext(it);
+	while (MyList_hasNext(handlerIt)) {
+		Sym sym = (Sym)MyList_getNext(handlerIt);
 		sym->offset = offset;
 		offset += sym->type->size;
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 	type->size = offset;
 }
 
@@ -132,15 +132,22 @@ Type createType_structure(const char* name, ListHead fieldList) {
 	return type;
 }
 
+Type createType_addr(Type targetType) {
+	Type type = (Type)malloc(sizeof(struct _Type_));
+	if (type) {
+		type->name = (char*)malloc(sizeof(char) * (strlen(targetType->name) + 10));
+		if (type->name)sprintf(type->name, "addr_%s", targetType->name);
+		type->kind = ADDR;
+		type->size = 4;
+		type->u.targetType = targetType;
+	}
+	return type;
+}
+
 
 void insertType(TypeTable table, Type type) {
 	MyList_pushElem(table->head, type);
 }
-
-Type integerType;
-Type floatType;
-Type errorType;
-
 
 void initTypeTable() {
 	typeTableList = MyList_createList();
@@ -158,9 +165,9 @@ void initTypeTable() {
 
 void printTypeTable() {
 	printf("type tables:\n");
-	ListIterator it = MyList_createIterator(typeTableList);
-	while (MyList_hasNext(it)) {
-		TypeTable table = (TypeTable)MyList_getNext(it);
+	ListIterator handlerIt = MyList_createIterator(typeTableList);
+	while (MyList_hasNext(handlerIt)) {
+		TypeTable table = (TypeTable)MyList_getNext(handlerIt);
 		printf("\ttypetable: ");
 		switch (table->type) {
 		case FIELD_GLOBAL: printf("global"); break;
@@ -191,5 +198,5 @@ void printTypeTable() {
 		}
 		MyList_destroyIterator(it2);
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 }

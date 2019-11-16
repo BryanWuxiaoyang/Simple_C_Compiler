@@ -126,7 +126,7 @@ while   {yylval=createNode(0,NULL,0,Other,yylineno); yylval->int_val=last_unit=W
 "=="    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_E; last_unit=RELOP;                                   return(RELOP);      }
 "!="    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_NE; last_unit=RELOP;                                    return(RELOP);      }
 "+"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_PLUS; last_unit=PLUS;                                  return(PLUS);       }
-"-"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB || last_unit == ID)  {yylval->op = OP_MINUS; last_unit=MINUS;   return(MINUS);}   else{yylval->op = OP_NEG; last_unit=NEG;  return(NEG); }     }
+"-"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); if(last_unit==INT||last_unit==FLOAT||last_unit==RP||last_unit==RB||last_unit==ID)  {yylval->op = OP_MINUS; last_unit=MINUS;   return(MINUS);}   else{yylval->op = OP_NEG; last_unit=NEG;  return(NEG); }     }
 "*"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_STAR; last_unit=STAR;                                 return(STAR);       }
 "/"     {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_DIV; last_unit=DIV;                                    return(DIV);        }
 "&&"    {yylval=createNode(0,NULL,0,SYN_OP,yylineno); yylval->op = OP_AND; last_unit=AND;                                        return(AND);        }

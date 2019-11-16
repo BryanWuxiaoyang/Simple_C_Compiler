@@ -18,50 +18,58 @@ struct _ListIterator_ {
 typedef struct _ListIterator_* ListIterator;
 
 ListIterator MyList_createIterator(ListHead head) {
-	ListIterator it = (ListIterator)malloc(sizeof(struct _ListIterator_));
-	if (it) {
-		it->head = head;
-		it->next = head->next;
-		it->prev = head;
+	ListIterator handlerIt = (ListIterator)malloc(sizeof(struct _ListIterator_));
+	if (handlerIt) {
+		handlerIt->head = head;
+		handlerIt->next = head->next;
+		handlerIt->prev = head;
 	}
-	return it;
+	return handlerIt;
 }
 
 ListIterator MyList_createReverseIterator(ListHead head) {
-	ListIterator it = (ListIterator)malloc(sizeof(struct _ListIterator_));
-	if(it) {
-		it->head = head;
-		it->next = head;
-		it->prev = head->prev;
+	ListIterator handlerIt = (ListIterator)malloc(sizeof(struct _ListIterator_));
+	if(handlerIt) {
+		handlerIt->head = head;
+		handlerIt->next = head;
+		handlerIt->prev = head->prev;
 	}
-	return it;
+	return handlerIt;
 }
 
-void* MyList_getNext(ListIterator it) {
-	void* elem = it->next->elem;
-	it->prev = it->next;
-	it->next = it->next->next;
+void* MyList_getNext(ListIterator handlerIt) {
+	void* elem = handlerIt->next->elem;
+	handlerIt->prev = handlerIt->next;
+	handlerIt->next = handlerIt->next->next;
 	return elem;
 }
 
-int MyList_hasNext(ListIterator it) {
-	return (it->next == it->head) ? 0 : 1;
+void* MyList_peekNext(ListIterator handlerIt) {
+	return handlerIt->next->elem;
 }
 
-void* MyList_getPrev(ListIterator it) {
-	void* elem = it->prev->elem;
-	it->next = it->prev;
-	it->prev = it->prev->prev;
+int MyList_hasNext(ListIterator handlerIt) {
+	return (handlerIt->next == handlerIt->head) ? 0 : 1;
+}
+
+void* MyList_getPrev(ListIterator handlerIt) {
+	void* elem = handlerIt->prev->elem;
+	handlerIt->next = handlerIt->prev;
+	handlerIt->prev = handlerIt->prev->prev;
 	return elem;
 }
 
-int MyList_hasPrev(ListIterator it) {
-	return (it->prev == it->head) ? 0 : 1;
+void* MyList_peekPrev(ListIterator handlerIt) {
+	return handlerIt->prev->elem;
+}
+
+int MyList_hasPrev(ListIterator handlerIt) {
+	return (handlerIt->prev == handlerIt->head) ? 0 : 1;
 }
 
 
-void MyList_destroyIterator(ListIterator it) {
-	free(it);
+void MyList_destroyIterator(ListIterator handlerIt) {
+	free(handlerIt);
 }
 
 
@@ -114,59 +122,81 @@ void* MyList_pop(ListHead head) {
 	return elem;
 }
 
-void* MyList_removePrev(ListIterator it) {
-	ListNode node1 = it->prev->prev;
-	ListNode node2 = it->prev;
-	ListNode node3 = it->next;
+void* MyList_removePrev(ListIterator handlerIt) {
+	ListNode node1 = handlerIt->prev->prev;
+	ListNode node2 = handlerIt->prev;
+	ListNode node3 = handlerIt->next;
 	node1->next = node3;
 	node3->prev = node1;
-	it->prev = node1;
-	it->next = node3;
+	handlerIt->prev = node1;
+	handlerIt->next = node3;
 	return node2->elem;
 }
 
-void* MyList_removeNext(ListIterator it) {
-	ListNode node1 = it->prev;
-	ListNode node2 = it->next;
-	ListNode node3 = it->next->next;
+void* MyList_removeNext(ListIterator handlerIt) {
+	ListNode node1 = handlerIt->prev;
+	ListNode node2 = handlerIt->next;
+	ListNode node3 = handlerIt->next->next;
 	node1->next = node3;
 	node3->prev = node1;
-	it->prev = node1;
-	it->next = node3;
+	handlerIt->prev = node1;
+	handlerIt->next = node3;
 	return node2->elem;
 }
 
-void MyList_clear(ListHead list) {
-	ListNode p = list->next;
-	while (p != list) {
+void MyList_clear(ListHead handlerList) {
+	ListNode p = handlerList->next;
+	while (p != handlerList) {
 		ListNode q = p;
 		p = p->next;
 		free(q);
 	}
-	list->next = list->prev = list;
+	handlerList->next = handlerList->prev = handlerList;
 }
 
-void MyList_insert(ListIterator it, void* elem) {
-	ListNode node1 = it->prev;
+void MyList_insert(ListIterator handlerIt, void* elem) {
+	ListNode node1 = handlerIt->prev;
 	ListNode node2 = MyList_wrapNode(elem);
-	ListNode node3 = it->next;
+	ListNode node3 = handlerIt->next;
 	node2->prev = node1;
 	node2->next = node3;
 	node1->next = node2;
 	node3->prev = node2;
-	it->prev = node1;
-	it->next = node2;
+	handlerIt->prev = node1;
+	handlerIt->next = node2;
 }
 
-void MyList_destroyList(ListHead list) {
-	MyList_clear(list);
-	free(list);
+void MyList_destroyList(ListHead handlerList) {
+	MyList_clear(handlerList);
+	free(handlerList);
 }
 
-void* MyList_getBack(ListHead list) {
-	return list->prev->elem;
+void* MyList_getBack(ListHead handlerList) {
+	return handlerList->prev->elem;
 }
 
-void* MyList_getFront(ListHead list) {
-	return list->next->elem;
+void* MyList_getFront(ListHead handlerList) {
+	return handlerList->next->elem;
+}
+
+void MyList_mergeList_intersect(ListHead dstList, ListHead srcList) {
+	ListIterator dstIt = MyList_createIterator(dstList);
+	while (MyList_hasNext(dstIt)) {
+		void* dstElem = MyList_getNext(dstIt);
+		int suc = 0;
+
+		ListIterator srcIt = MyList_createIterator(srcList);
+		while (MyList_hasNext(srcIt)) {
+			void* srcElem = MyList_getNext(srcIt);
+			if (dstElem == srcElem) {
+				suc = 1;
+				break;
+			}
+		}
+		MyList_destroyIterator(srcIt);
+
+		if (suc == 0) MyList_removePrev(dstIt);
+	}
+
+	MyList_destroyIterator(dstIt);
 }

@@ -38,9 +38,9 @@ void pushSymTable(SymTable table) {
 
 SymTable popSymTable() {
 	SymTable table = (SymTable)MyList_pop(symTableList);
-	ListIterator it = MyList_createReverseIterator(symTableList);
-	curSymTable = (SymTable)MyList_getPrev(it);
-	MyList_destroyIterator(it);
+	ListIterator handlerIt = MyList_createReverseIterator(symTableList);
+	curSymTable = (SymTable)MyList_getPrev(handlerIt);
+	MyList_destroyIterator(handlerIt);
 	return table;
 }
 
@@ -60,28 +60,28 @@ void insertSym(SymTable table, Sym sym) {
 }
 
 Sym findSym(SymTable table, const char* name) {
-	ListIterator it = MyList_createIterator(table->head);
+	ListIterator handlerIt = MyList_createIterator(table->head);
 	Sym res = NULL;
-	while (MyList_hasNext(it)) {
-		Sym sym = (Sym)MyList_getNext(it);
+	while (MyList_hasNext(handlerIt)) {
+		Sym sym = (Sym)MyList_getNext(handlerIt);
 		if (strcmp(sym->name, name) == 0) {
 			res = sym;
 			break;
 		}
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 	return res;
 }
 
 Sym findSym_all(const char* name) {
-	ListIterator it = MyList_createReverseIterator(symTableList);
+	ListIterator handlerIt = MyList_createReverseIterator(symTableList);
 	Sym res = NULL;
-	while (MyList_hasPrev(it)) {
-		SymTable table = (SymTable)MyList_getPrev(it);
+	while (MyList_hasPrev(handlerIt)) {
+		SymTable table = (SymTable)MyList_getPrev(handlerIt);
 		res = findSym(table, name);
 		if (res) break;
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 	return res;
 }
 
@@ -94,9 +94,9 @@ void initSymTable() {
 
 void printSymTable() {
 	printf("symbal tables:\n");
-	ListIterator it = MyList_createIterator(symTableList);
-	while (MyList_hasNext(it)) {
-		SymTable table = (SymTable)MyList_getNext(it);
+	ListIterator handlerIt = MyList_createIterator(symTableList);
+	while (MyList_hasNext(handlerIt)) {
+		SymTable table = (SymTable)MyList_getNext(handlerIt);
 		printf("\tsymtable: ");
 		switch (table->type) {
 		case FIELD_GLOBAL: printf("global"); break;
@@ -112,5 +112,5 @@ void printSymTable() {
 		}
 		MyList_destroyIterator(it2);
 	}
-	MyList_destroyIterator(it);
+	MyList_destroyIterator(handlerIt);
 }

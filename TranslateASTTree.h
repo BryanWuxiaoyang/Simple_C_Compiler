@@ -35,7 +35,7 @@ void translateASTTree(ASTNode node) {
 	case OP_REF: {
 		if (node->accessTag <= 1) {
 			translateASTTree(node->lc);
-			appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, getASTNodeStr_r(node), ILOP_ADDR));
+			//appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, getASTNodeStr_l(node), ILOP_ADDR));
 		}
 		break;
 	}
