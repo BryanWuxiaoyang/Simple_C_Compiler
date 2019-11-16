@@ -392,13 +392,8 @@ int main(int argc,char** argv){
     yyrestart(f);
     yyparse();
     if(ok){
-        //printTree(nodeBuffer[0],0);
-        printf("Syntax OK!\n");
         semAnalysis(nodeBuffer[0]);
         printInterCodeList(NULL, NULL);
-		//FILE* file = fopen("tree.txt", "w");
-		//putSyntaxTreeToFile(file, nodeBuffer[0]);
-		//fclose(file);
     }
     return 0;
 }
