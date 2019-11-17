@@ -59,7 +59,7 @@ struct _Node_ {
 };
 typedef struct _Node_* Node;
 
-//#define TEST_MODE
+#define TEST_MODE
 
 #ifdef TEST_MODE
 int indent = -1;
@@ -176,10 +176,10 @@ void SM_Specifier(Node node, Type* ret_specType);
 void SM_StructSpecifier(Node node, Type* ret_specType);
 void SM_OptTag(Node node, char** ret_name);
 void SM_Tag(Node node, char** ret_name);
-void SM_VarDec(Node node, Type type, Sym* ret_var, ASTNode* ret_astNode);
+void SM_VarDec(Node node, Type type, Sym* ret_var, ASTNodeHandler* ret_handler);
 void SM_FunDec(Node node, Type specType, int isDef);
 void SM_VarList(Node node, ListHead ret_list);
-void SM_ParamDec(Node node, Sym* ret_var, ASTNode* ret_astNode);
+void SM_ParamDec(Node node, Sym* ret_var, ASTNodeHandler* ret_handler);
 void SM_CompSt(Node node, Type returnType, ListHead nextList);
 void SM_StmtList(Node node, Type returnType, ListHead nextList);
 void SM_Stmt(Node node, Type returnType, ListHead nextList);
@@ -377,7 +377,7 @@ void SM_Tag(Node node, char** ret_name) {
 #endif
 }
 
-void SM_VarDec(Node node, Type type, Sym* ret_var, ASTNode* ret_astNode) {
+void SM_VarDec(Node node, Type type, Sym* ret_var, ASTNodeHandler* ret_handler) {
 #ifdef TEST_MODE
 	testEnterPrint(node);
 #endif
@@ -386,17 +386,15 @@ void SM_VarDec(Node node, Type type, Sym* ret_var, ASTNode* ret_astNode) {
 		char* name = idNode->str_val;
 		Sym sym = createSym(name, type);
 		ASTNodeHandler handler = createASTNode_sym(sym);
-		ASTNode astNode = getASTNode(handler);
-
 		if (ret_var)* ret_var = sym;
-		if (ret_astNode)* ret_astNode = astNode;
+		if (ret_handler)* ret_handler = handler;
 	}
 	else if (node->expandNo == 2) {// VarDec LB INT RB
 		Node varDecNode = node->child[0];
 		Node intNode = node->child[2];
 		int size = intNode->int_val;
 		Type arrayType = createType_array("", type, size);
-		SM_VarDec(varDecNode, arrayType, ret_var, ret_astNode);
+		SM_VarDec(varDecNode, arrayType, ret_var, ret_handler);
 	}
 #ifdef TEST_MODE
 	testExitPrint(node);
@@ -461,15 +459,15 @@ void SM_VarList(Node node, ListHead ret_symList) {
 		Node paramDecNode = node->child[0];
 		Node varListNode = node->child[2];
 		Sym sym = NULL;
-		ASTNode astNode = NULL;
+		ASTNodeHandler handler = NULL;
 
-		SM_ParamDec(paramDecNode, &sym, &astNode);
+		SM_ParamDec(paramDecNode, &sym, &handler);
 
 		if (sym->type->kind == STRUCTURE) {// 将结构体型的参数转换成其指针
 			sym->type = createType_addr(sym->type);
 			insertType(getCurTypeTable(), sym->type);
 		}
-		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_l(astNode), ILOP_PARAM));
+		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_l(getASTNode(handler)), ILOP_PARAM));
 		if (ret_symList) MyList_pushElem(ret_symList, sym);
 
 		SM_VarList(varListNode, ret_symList);
@@ -477,16 +475,16 @@ void SM_VarList(Node node, ListHead ret_symList) {
 	else if (node->expandNo == 2){ //ParamDec
 		Node paramDecNode = node->child[0];
 		Sym sym = NULL;
-		ASTNode astNode = NULL;
+		ASTNodeHandler handler = NULL;
 
-		SM_ParamDec(paramDecNode, &sym, &astNode);
+		SM_ParamDec(paramDecNode, &sym, &handler);
 
 		if (sym->type->kind == STRUCTURE) {
 			sym->type = createType_addr(sym->type);
 			insertType(getCurTypeTable(), sym->type);
 		}
 
-		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_l(astNode), ILOP_PARAM));
+		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_l(getASTNode(handler)), ILOP_PARAM));
 
 		if (ret_symList) MyList_pushElem(ret_symList, sym);
 	}
@@ -495,7 +493,7 @@ void SM_VarList(Node node, ListHead ret_symList) {
 #endif
 }
 
-void SM_ParamDec(Node node, Sym* ret_var, ASTNode* ret_astNode) {
+void SM_ParamDec(Node node, Sym* ret_var, ASTNodeHandler* ret_handler) {
 #ifdef TEST_MODE
 	testEnterPrint(node);
 #endif
@@ -504,7 +502,7 @@ void SM_ParamDec(Node node, Sym* ret_var, ASTNode* ret_astNode) {
 		Node varDecNode = node->child[1];
 		Type specType = NULL;
 		SM_Specifier(specifierNode, &specType);
-		SM_VarDec(varDecNode, specType, ret_var, ret_astNode);
+		SM_VarDec(varDecNode, specType, ret_var, ret_handler);
 	}
 #ifdef TEST_MODE
 	testExitPrint(node);
@@ -909,37 +907,35 @@ void SM_Dec(Node node, Type specType, Sym* ret_var) {
 #endif
 	if (node->expandNo == 1) {// VarDec
 		Node varDecNode = node->child[0];
-		ASTNode astNode = NULL;
-		SM_VarDec(varDecNode, specType, ret_var, &astNode);
+		ASTNodeHandler handler = NULL;
+		SM_VarDec(varDecNode, specType, ret_var, &handler);
 		
 		if (((*ret_var)->type->kind == STRUCTURE || (*ret_var)->type->kind == ARRAY) && getCurSymTable()->type != FIELD_STRUCT) {
 			char* size = (char*)malloc(sizeof(char) * 10);
 			if (size) {
 				sprintf(size, "%d", (*ret_var)->type->size);
-				appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(astNode), ILOP_DEC));
+				appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(getASTNode(handler)), ILOP_DEC));
 			}
 		}
 	}
 	else if (node->expandNo == 2) {// VarDec ASSIGNOP Exp
 		Node varDecNode = node->child[0];
 		Node expNode = node->child[2];
+		ASTNodeHandler handler1 = NULL;
 		ASTNodeHandler handler2 = NULL;
-		ASTNode astNode1 = NULL;
-		ASTNode astNode2 = NULL;
-		SM_VarDec(varDecNode, specType, ret_var, &astNode1);
+		SM_VarDec(varDecNode, specType, ret_var, &handler1);
 		SM_Exp(expNode, &handler2, NULL, NULL, 0, 0);
-		astNode2 = getASTNode(handler2);
-		createASTNode_op(OP_ASSIGN, astNode1, astNode2);
+		createASTNode_op(OP_ASSIGN, getASTNode(handler1), getASTNode(handler2));
 		
 		if (((*ret_var)->type->kind == STRUCTURE || (*ret_var)->type->kind == ARRAY) && getCurSymTable()->type != FIELD_STRUCT) {
 			char* size = (char*)malloc(sizeof(char) * 10);
 			if (size) {
 				sprintf(size, "%d", (*ret_var)->type->size);
-				appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(astNode1), ILOP_DEC));
+				appendInterCode(createInterCode(size, NULL, getASTNodeStr_l(getASTNode(handler1)), ILOP_DEC));
 			}
 		}
 
-		InterCode code = createInterCode(getASTNodeStr_r(astNode2), NULL, getASTNodeStr_l(astNode1), ILOP_ASSIGN);
+		InterCode code = createInterCode(getASTNodeStr_r(getASTNode(handler2)), NULL, getASTNodeStr_l(getASTNode(handler1)), ILOP_ASSIGN);
 		appendInterCode(code);
 	}
 #ifdef TEST_MODE

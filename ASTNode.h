@@ -1,5 +1,6 @@
 #pragma once
 #include <assert.h>
+#include "MyList.h"
 
 struct _ASTNodeHandler_;
 
@@ -39,67 +40,12 @@ struct _ASTNode_ {
 	ConstValue constValue;  // 用于常量优化，非必要项
 
 	int accessTag;
-
-	struct _ASTNodeHandler_* handler;
+	int removeTag;
 };
 typedef struct _ASTNode_* ASTNode;
 
-struct _ASTNodeHandler_ {
-	ASTNode node;
-	int removeTag;
-};
-typedef struct _ASTNodeHandler_* ASTNodeHandler;
-
-ASTNodeHandler createASTNodeHandler(ASTNode node) {
-	if (node->handler == NULL) {
-		node->handler = (ASTNodeHandler)malloc(sizeof(struct _ASTNodeHandler_));
-		if (node->handler) {
-			node->handler->node = node;
-			node->handler->removeTag = 0;
-		}
-	}
-
-	return node->handler;
+void clearASTNode(ASTNode node) {
+	free(node->name);
+	MyList_destroyList(node->parents);
 }
 
-ASTNode getASTNode(ASTNodeHandler handler) {
-	if (handler->removeTag > 0) assert(0);
-	else return handler->node;
-	return NULL;
-}
-
-void destroyASTNodeHandler(ASTNodeHandler handler) {
-	return;
-}
-
-void destroyASTNode(ASTNode node) {
-	if (node->name) free(node->name);
-	if (node->parents) MyList_destroyList(node->parents);
-	if (node->handler) {
-		node->handler->removeTag = 1;
-		node->handler->node = NULL;
-	}
-}
-
-ASTNode createASTNode(int height, ASTNodeType type, ASTNodeValue value, char* name, ASTNode lc, ASTNode rc, ListHead parents) {
-	ASTNode node = (ASTNode)malloc(sizeof(struct _ASTNode_));
-	if (node) {
-		node->height = height;
-		node->type = type;
-		node->value = value;
-		node->name = name;
-		node->lc = lc;
-		node->rc = rc;
-		node->parents = parents;
-		node->accessTag = 0;
-		node->handler = NULL;
-		assignConstNone(&node->constValue);
-
-		node->handler = createASTNodeHandler(node);
-	}
-	return node;
-}
-
-int isExistASTNode(ASTNodeHandler handler) {
-	return handler->removeTag == 0;
-}

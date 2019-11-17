@@ -10,6 +10,7 @@
 #include "OP.h"
 #include "NameCreator.h"
 #include "ASTNode.h"
+#include "ASTNodeHandler.h"
 
 #define VAR_CONST_OPTMIZATION
 
@@ -53,28 +54,11 @@ LeafASTNodeIterator createLeafASTNodeIterator() {
 }
 
 int hasNextLeafASTNode(LeafASTNodeIterator it) {
-	int suc = 0;
-	while (MyList_hasNext(it->handlerIt)) {
-		ASTNodeHandler handler = (ASTNodeHandler)MyList_peekNext(it->handlerIt);
-		if (isExistASTNode(handler)) {
-			suc = 1;
-			break;
-		}
-		else {
-			destroyASTNodeHandler(handler);
-			MyList_removeNext(it->handlerIt);
-		}
-	}
-	return suc;
+	return MyList_hasNext(it->handlerIt);
 }
 
 ASTNodeHandler getNextLeafASTNode(LeafASTNodeIterator it) {
-	if (hasNextLeafASTNode(it)) {
-		ASTNodeHandler handler = (ASTNodeHandler)MyList_getNext(it->handlerIt);
-		return handler;
-	}
-	assert(0);
-	return NULL;
+	return (ASTNodeHandler)MyList_getNext(it->handlerIt);
 }
 
 void destroyLeafASTNodeIterator(LeafASTNodeIterator it) {
@@ -99,38 +83,16 @@ void destroyInnerASTNodeIterator(InnerASTNodeIterator it) {
 }
 
 int hasNextInnerASTNode(InnerASTNodeIterator it) {
-	int suc = 0;
-
-	while (MyList_hasNext(it->handlerIt)) {
-		ASTNodeHandler handler = (ASTNodeHandler)MyList_peekNext(it->handlerIt);
-		if (handler->removeTag == 0) {
-			suc = 1;
-			break;
-		}
-		else {
-			destroyASTNodeHandler(handler);
-			MyList_removeNext(it->handlerIt);
-		}
-	}
-	if (suc == 0) {
-		while (suc == 0 && MyList_hasNext(it->tableListIt)) {
+	if (MyList_hasNext(it->handlerIt)) return 1;
+	else{
+		while (MyList_hasNext(it->tableListIt)) {
 			ASTTable table = (ASTTable)MyList_getNext(it->tableListIt);
 			MyList_destroyIterator(it->handlerIt);
 			it->handlerIt = MyList_createIterator(table->handlerList);
-			while (MyList_hasNext(it->handlerIt)) {
-				ASTNodeHandler handler = (ASTNodeHandler)MyList_peekNext(it->handlerIt);
-				if (isExistASTNode(handler)) {
-					suc = 1;
-					break;
-				}
-				else {
-					destroyASTNodeHandler(handler);
-					MyList_removeNext(it->handlerIt);
-				}
-			}
+			if (MyList_hasNext(it->handlerIt)) return 1;
 		}
 	}
-	return suc;
+	return 0;
 }
 
 ASTNodeHandler peekNextInnerASTNode(InnerASTNodeIterator it) {
@@ -332,8 +294,6 @@ ASTNodeHandler findASTNode(ASTNodeType type, ASTNodeValue value, ASTNode lc, AST
 		while (hasNextInnerASTNode(handlerIt)) {
 			ASTNodeHandler handler = getNextInnerASTNode(handlerIt);
 			ASTNode node = getASTNode(handler);
-			destroyASTNodeHandler(handler);
-
 			if (node->type == AST_OP && node->value.op == value.op && node->lc == lc && node->rc == rc){
 				destroyInnerASTNodeIterator(handlerIt);
 				return createASTNodeHandler(node);
@@ -346,7 +306,6 @@ ASTNodeHandler findASTNode(ASTNodeType type, ASTNodeValue value, ASTNode lc, AST
 		while (hasNextLeafASTNode(handlerIt)) {
 			ASTNodeHandler handler = getNextLeafASTNode(handlerIt);
 			ASTNode node = getASTNode(handler);
-			destroyASTNodeHandler(handler);
 
 			int suc = 0;
 			switch (type) {
@@ -454,6 +413,7 @@ void clearParents(ASTNode node) { // 清除子表达式记录，不是清除节点本身
 		while (hasNextInnerASTNode(innerIt)) {
 			ASTNodeHandler handler = peekNextInnerASTNode(innerIt);
 			if (pNode == getASTNode(handler)) {
+				destroyASTNodeHandler(handler);
 				removeNextInnerASTNode(innerIt);
 				break;
 			}
@@ -514,7 +474,7 @@ ASTNodeHandler createASTNode_sym(Sym sym) {
 		handler = createASTNodeHandler(node);
 		insertASTLeafNode(handler);
 	}
-	return handler;
+	return copyASTNodeHandler(handler);
 }
 
 ASTNodeHandler createASTNode_func(Func func) {
@@ -531,7 +491,7 @@ ASTNodeHandler createASTNode_func(Func func) {
 		);
 	ASTNodeHandler handler = createASTNodeHandler(node);
 	insertASTLeafNode(handler);
-	return handler;
+	return copyASTNodeHandler(handler);
 }
 
 ASTNodeHandler createASTNode_integer(int v) {
@@ -558,7 +518,7 @@ ASTNodeHandler createASTNode_integer(int v) {
 
 		insertASTLeafNode(handler);
 	}
-	return handler;
+	return copyASTNodeHandler(handler);
 }
 
 ASTNodeHandler createASTNode_float(float v) {
@@ -585,7 +545,7 @@ ASTNodeHandler createASTNode_float(float v) {
 
 		insertASTLeafNode(handler);
 	}
-	return handler;
+	return copyASTNodeHandler(handler);
 }
 
 ASTNodeHandler createASTNode_op(OP op, ASTNode lc, ASTNode rc) {
@@ -651,7 +611,11 @@ ASTNodeHandler createASTNode_op(OP op, ASTNode lc, ASTNode rc) {
 	}
 #endif
 
+#ifdef SUB_EXP_OPTMIZATION
+	return copyASTNodeHandler(handler);
+#else
 	return handler;
+#endif
 }
 
 int astIndent = -1;
