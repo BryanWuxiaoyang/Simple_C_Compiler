@@ -143,6 +143,7 @@ void processCode(InterCode code,int lineno,UniNodeList* symList){
             break;
         //下面这些要处理一个目标赋值
         case ILOP_DEC:
+        case ILOP_CALL:
             processCodePart(target,symList,p,TARGET);
             break;
         //下面这些要处理一个参数引用
@@ -156,7 +157,6 @@ void processCode(InterCode code,int lineno,UniNodeList* symList){
         case ILOP_LABEL:
         case ILOP_FUNCTION:
         case ILOP_GOTO:
-        case ILOP_CALL:
         case ILOP_READ://READ函数就不优化了，要不可能读文件读错位
             break;
     }
@@ -234,6 +234,23 @@ void processUselessCode(UniNodeList* symList,ListIterator it){
     }
 }
 
+void processUselessCode2(ListIterator it){
+    while(MyList_hasNext(it)){
+        InterCode code=(InterCode)MyList_getNext(it);
+        InterCode curCode;
+	    char* target = code->target;
+        char* arg1=code->arg1;
+        if(curCode==ILOP_CALL){
+            InterCode nextCode=(InterCode)MyList_getNext(it);
+            char* nextArg1=nextCode->arg1;
+            if(nextCode->op==ILOP_ASSIGN&&strcmp(target,nextArg1)==0){
+                nextCode->op=ILOP_CALL;
+                strcpy(nextArg1,arg1);
+            }
+        }
+    }
+}
+
 UniNodeList* getCodeList(ListIterator it){
     UniNodeList* symList=createUniNodeList();
     int cur=0;
@@ -248,7 +265,8 @@ void optimizeInterCodeLinear() {
 	ListIterator it = MyList_createIterator(interCodeList);
     UniNodeList* symList=getCodeList(it);
     it=MyList_createIterator(interCodeList);
-    processUselessCode(symList,it);//处理情况2和3，过程中不会删除代码，只会修改，处理之后会产生一些无效的赋值或计算
+    //processUselessCode(symList,it);//处理情况2和3，过程中不会删除代码，只会修改，处理之后会产生一些无效的赋值或计算；但是这样没有考虑循环和分支，有不少问题
+    processUselessCode2(it);
     it=MyList_createIterator(interCodeList);
     UniNodeList* newSymList=getCodeList(it);
     it=MyList_createIterator(interCodeList);

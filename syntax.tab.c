@@ -1,4 +1,4 @@
-/* A Bison parser, made by GNU Bison 3.3.2.  */
+/* A Bison parser, made by GNU Bison 3.4.1.  */
 
 /* Bison implementation for Yacc-like parsers in C
 
@@ -48,7 +48,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "3.3.2"
+#define YYBISON_VERSION "3.4.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -66,7 +66,7 @@
 
 
 /* First part of user prologue.  */
-#line 1 "syntax.y" /* yacc.c:337  */
+#line 1 "syntax.y"
 
     #include <stdio.h>
     #include <string.h>
@@ -97,7 +97,8 @@
         lex_err = lineno;
     }
 
-#line 101 "syntax.tab.c" /* yacc.c:337  */
+#line 101 "syntax.tab.c"
+
 # ifndef YY_NULLPTR
 #  if defined __cplusplus
 #   if 201103L <= __cplusplus
@@ -118,10 +119,7 @@
 # define YYERROR_VERBOSE 0
 #endif
 
-/* In a future release of Bison, this section will be replaced
-   by #include "syntax.tab.h".  */
-#ifndef YY_YY_SYNTAX_TAB_H_INCLUDED
-# define YY_YY_SYNTAX_TAB_H_INCLUDED
+
 /* Debug traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -194,7 +192,7 @@ extern YYSTYPE yylval;
 extern YYLTYPE yylloc;
 int yyparse (void);
 
-#endif /* !YY_YY_SYNTAX_TAB_H_INCLUDED  */
+
 
 
 
@@ -297,6 +295,8 @@ typedef short yytype_int16;
 # define YY_INITIAL_VALUE(Value) /* Nothing. */
 #endif
 
+
+#define YY_ASSERT(E) ((void) (0 && (E)))
 
 #if ! defined yyoverflow || YYERROR_VERBOSE
 
@@ -1317,6 +1317,8 @@ yynewstate:
 | yynewstate -- set current state (the top of the stack) to yystate.  |
 `--------------------------------------------------------------------*/
 yysetstate:
+  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
+  YY_ASSERT (0 <= yystate && yystate < YYNSTATES);
   *yyssp = (yytype_int16) yystate;
 
   if (yyss + yystacksize - 1 <= yyssp)
@@ -1383,8 +1385,6 @@ yysetstate:
         YYABORT;
     }
 #endif /* !defined yyoverflow && !defined YYSTACK_RELOCATE */
-
-  YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
   if (yystate == YYFINAL)
     YYACCEPT;
@@ -1490,166 +1490,166 @@ yyreduce:
   YY_REDUCE_PRINT (yyn);
   switch (yyn)
     {
-        case 2:
-#line 48 "syntax.y" /* yacc.c:1652  */
+  case 2:
+#line 48 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0];  
         yyval=createNode(1,nodeBuffer,1,Program,(yyloc).first_line);     
         nodeBuffer[0]=yyval; 
     }
-#line 1501 "syntax.tab.c" /* yacc.c:1652  */
+#line 1501 "syntax.tab.c"
     break;
 
   case 3:
-#line 53 "syntax.y" /* yacc.c:1652  */
+#line 53 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1];   
         nodeBuffer[1]=yyvsp[0];  
         yyval=createNode(2,nodeBuffer,1,ExtDefList,(yyloc).first_line);
     }
-#line 1511 "syntax.tab.c" /* yacc.c:1652  */
+#line 1511 "syntax.tab.c"
     break;
 
   case 4:
-#line 57 "syntax.y" /* yacc.c:1652  */
+#line 57 "syntax.y"
     {
         yyval=createNode(0,NULL,2,ExtDefList,(yyloc).first_line); 
     }
-#line 1519 "syntax.tab.c" /* yacc.c:1652  */
+#line 1519 "syntax.tab.c"
     break;
 
   case 5:
-#line 60 "syntax.y" /* yacc.c:1652  */
+#line 60 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,1,ExtDef,(yyloc).first_line); 
     }
-#line 1530 "syntax.tab.c" /* yacc.c:1652  */
+#line 1530 "syntax.tab.c"
     break;
 
   case 6:
-#line 65 "syntax.y" /* yacc.c:1652  */
+#line 65 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,2,ExtDef,(yyloc).first_line); 
     }
-#line 1540 "syntax.tab.c" /* yacc.c:1652  */
+#line 1540 "syntax.tab.c"
     break;
 
   case 7:
-#line 69 "syntax.y" /* yacc.c:1652  */
+#line 69 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,3,ExtDef,(yyloc).first_line);
     }
-#line 1551 "syntax.tab.c" /* yacc.c:1652  */
+#line 1551 "syntax.tab.c"
     break;
 
   case 8:
-#line 74 "syntax.y" /* yacc.c:1652  */
+#line 74 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2];
         nodeBuffer[1]=yyvsp[-1];
         nodeBuffer[2]=yyvsp[0];
         yyval=createNode(3,nodeBuffer,4,ExtDef,(yyloc).first_line);
     }
-#line 1562 "syntax.tab.c" /* yacc.c:1652  */
+#line 1562 "syntax.tab.c"
     break;
 
   case 9:
-#line 79 "syntax.y" /* yacc.c:1652  */
+#line 79 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 12);
     }
-#line 1570 "syntax.tab.c" /* yacc.c:1652  */
+#line 1570 "syntax.tab.c"
     break;
 
   case 10:
-#line 81 "syntax.y" /* yacc.c:1652  */
+#line 81 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 2);
     }
-#line 1578 "syntax.tab.c" /* yacc.c:1652  */
+#line 1578 "syntax.tab.c"
     break;
 
   case 11:
-#line 83 "syntax.y" /* yacc.c:1652  */
+#line 83 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 2);
     }
-#line 1586 "syntax.tab.c" /* yacc.c:1652  */
+#line 1586 "syntax.tab.c"
     break;
 
   case 12:
-#line 85 "syntax.y" /* yacc.c:1652  */
+#line 85 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 1);
     }
-#line 1594 "syntax.tab.c" /* yacc.c:1652  */
+#line 1594 "syntax.tab.c"
     break;
 
   case 13:
-#line 87 "syntax.y" /* yacc.c:1652  */
+#line 87 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 1);
     }
-#line 1602 "syntax.tab.c" /* yacc.c:1652  */
+#line 1602 "syntax.tab.c"
     break;
 
   case 14:
-#line 90 "syntax.y" /* yacc.c:1652  */
+#line 90 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,1,ExtDecList,(yyloc).first_line); 
     }
-#line 1611 "syntax.tab.c" /* yacc.c:1652  */
+#line 1611 "syntax.tab.c"
     break;
 
   case 15:
-#line 93 "syntax.y" /* yacc.c:1652  */
+#line 93 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,2,ExtDecList,(yyloc).first_line);
     }
-#line 1622 "syntax.tab.c" /* yacc.c:1652  */
+#line 1622 "syntax.tab.c"
     break;
 
   case 16:
-#line 99 "syntax.y" /* yacc.c:1652  */
+#line 99 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,1,Specifier,(yyloc).first_line); 
     }
-#line 1631 "syntax.tab.c" /* yacc.c:1652  */
+#line 1631 "syntax.tab.c"
     break;
 
   case 17:
-#line 102 "syntax.y" /* yacc.c:1652  */
+#line 102 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,2,Specifier,(yyloc).first_line); 
     }
-#line 1640 "syntax.tab.c" /* yacc.c:1652  */
+#line 1640 "syntax.tab.c"
     break;
 
   case 18:
-#line 105 "syntax.y" /* yacc.c:1652  */
+#line 105 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,3,Specifier,(yyloc).first_line); 
     }
-#line 1649 "syntax.tab.c" /* yacc.c:1652  */
+#line 1649 "syntax.tab.c"
     break;
 
   case 19:
-#line 109 "syntax.y" /* yacc.c:1652  */
+#line 109 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-4]; 
         nodeBuffer[1]=yyvsp[-3]; 
@@ -1658,56 +1658,56 @@ yyreduce:
         nodeBuffer[4]=yyvsp[0]; 
         yyval=createNode(5,nodeBuffer,1,StructSpecifier,(yyloc).first_line); 
     }
-#line 1662 "syntax.tab.c" /* yacc.c:1652  */
+#line 1662 "syntax.tab.c"
     break;
 
   case 20:
-#line 116 "syntax.y" /* yacc.c:1652  */
+#line 116 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,2,StructSpecifier,(yyloc).first_line); 
     }
-#line 1672 "syntax.tab.c" /* yacc.c:1652  */
+#line 1672 "syntax.tab.c"
     break;
 
   case 21:
-#line 121 "syntax.y" /* yacc.c:1652  */
+#line 121 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,1,OptTag,(yyloc).first_line);
     }
-#line 1681 "syntax.tab.c" /* yacc.c:1652  */
+#line 1681 "syntax.tab.c"
     break;
 
   case 22:
-#line 124 "syntax.y" /* yacc.c:1652  */
+#line 124 "syntax.y"
     {
         yyval=createNode(0,NULL,2,OptTag,(yyloc).first_line);
     }
-#line 1689 "syntax.tab.c" /* yacc.c:1652  */
+#line 1689 "syntax.tab.c"
     break;
 
   case 23:
-#line 127 "syntax.y" /* yacc.c:1652  */
+#line 127 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,1,Tag,(yyloc).first_line); 
     }
-#line 1698 "syntax.tab.c" /* yacc.c:1652  */
+#line 1698 "syntax.tab.c"
     break;
 
   case 24:
-#line 131 "syntax.y" /* yacc.c:1652  */
+#line 131 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,1,VarDec,(yyloc).first_line); 
     }
-#line 1707 "syntax.tab.c" /* yacc.c:1652  */
+#line 1707 "syntax.tab.c"
     break;
 
   case 25:
-#line 134 "syntax.y" /* yacc.c:1652  */
+#line 134 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-3]; 
         nodeBuffer[1]=yyvsp[-2]; 
@@ -1715,20 +1715,20 @@ yyreduce:
         nodeBuffer[3]=yyvsp[0]; 
         yyval=createNode(4,nodeBuffer,2,VarDec,(yyloc).first_line); 
     }
-#line 1719 "syntax.tab.c" /* yacc.c:1652  */
+#line 1719 "syntax.tab.c"
     break;
 
   case 26:
-#line 140 "syntax.y" /* yacc.c:1652  */
+#line 140 "syntax.y"
     {
         yyval = createNode(0, NULL,3,VarDec,(yyloc).first_line); 
         errorTypeB((yyloc).first_line, 5);
     }
-#line 1728 "syntax.tab.c" /* yacc.c:1652  */
+#line 1728 "syntax.tab.c"
     break;
 
   case 27:
-#line 144 "syntax.y" /* yacc.c:1652  */
+#line 144 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-3]; 
         nodeBuffer[1]=yyvsp[-2]; 
@@ -1736,68 +1736,68 @@ yyreduce:
         nodeBuffer[3]=yyvsp[0]; 
         yyval=createNode(4,nodeBuffer,1,FunDec,(yyloc).first_line); 
     }
-#line 1740 "syntax.tab.c" /* yacc.c:1652  */
+#line 1740 "syntax.tab.c"
     break;
 
   case 28:
-#line 150 "syntax.y" /* yacc.c:1652  */
+#line 150 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,2,FunDec,(yyloc).first_line); 
     }
-#line 1751 "syntax.tab.c" /* yacc.c:1652  */
+#line 1751 "syntax.tab.c"
     break;
 
   case 29:
-#line 155 "syntax.y" /* yacc.c:1652  */
+#line 155 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 21);
     }
-#line 1759 "syntax.tab.c" /* yacc.c:1652  */
+#line 1759 "syntax.tab.c"
     break;
 
   case 30:
-#line 157 "syntax.y" /* yacc.c:1652  */
+#line 157 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 21);
     }
-#line 1767 "syntax.tab.c" /* yacc.c:1652  */
+#line 1767 "syntax.tab.c"
     break;
 
   case 31:
-#line 160 "syntax.y" /* yacc.c:1652  */
+#line 160 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,1,VarList,(yyloc).first_line); 
     }
-#line 1778 "syntax.tab.c" /* yacc.c:1652  */
+#line 1778 "syntax.tab.c"
     break;
 
   case 32:
-#line 165 "syntax.y" /* yacc.c:1652  */
+#line 165 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,2,VarList,(yyloc).first_line); 
     }
-#line 1787 "syntax.tab.c" /* yacc.c:1652  */
+#line 1787 "syntax.tab.c"
     break;
 
   case 33:
-#line 169 "syntax.y" /* yacc.c:1652  */
+#line 169 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,1,ParamDec,(yyloc).first_line); 
     }
-#line 1797 "syntax.tab.c" /* yacc.c:1652  */
+#line 1797 "syntax.tab.c"
     break;
 
   case 34:
-#line 174 "syntax.y" /* yacc.c:1652  */
+#line 174 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-3]; 
         nodeBuffer[1]=yyvsp[-2]; 
@@ -1805,70 +1805,70 @@ yyreduce:
         nodeBuffer[3]=yyvsp[0]; 
         yyval=createNode(4,nodeBuffer,1,CompSt,(yyloc).first_line); 
     }
-#line 1809 "syntax.tab.c" /* yacc.c:1652  */
+#line 1809 "syntax.tab.c"
     break;
 
   case 35:
-#line 180 "syntax.y" /* yacc.c:1652  */
+#line 180 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,2,CompSt,(yyloc).first_line); 
         errorTypeB((yyloc).first_line, 0);
     }
-#line 1820 "syntax.tab.c" /* yacc.c:1652  */
+#line 1820 "syntax.tab.c"
     break;
 
   case 36:
-#line 186 "syntax.y" /* yacc.c:1652  */
+#line 186 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,1,StmtList,(yyloc).first_line); 
     }
-#line 1830 "syntax.tab.c" /* yacc.c:1652  */
+#line 1830 "syntax.tab.c"
     break;
 
   case 37:
-#line 190 "syntax.y" /* yacc.c:1652  */
+#line 190 "syntax.y"
     {
         yyval=createNode(0,NULL,2,StmtList,(yyloc).first_line);
     }
-#line 1838 "syntax.tab.c" /* yacc.c:1652  */
+#line 1838 "syntax.tab.c"
     break;
 
   case 38:
-#line 193 "syntax.y" /* yacc.c:1652  */
+#line 193 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,1,Stmt,(yyloc).first_line); 
     }
-#line 1848 "syntax.tab.c" /* yacc.c:1652  */
+#line 1848 "syntax.tab.c"
     break;
 
   case 39:
-#line 197 "syntax.y" /* yacc.c:1652  */
+#line 197 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,2,Stmt,(yyloc).first_line); 
     }
-#line 1857 "syntax.tab.c" /* yacc.c:1652  */
+#line 1857 "syntax.tab.c"
     break;
 
   case 40:
-#line 200 "syntax.y" /* yacc.c:1652  */
+#line 200 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,3,Stmt,(yyloc).first_line); 
     }
-#line 1868 "syntax.tab.c" /* yacc.c:1652  */
+#line 1868 "syntax.tab.c"
     break;
 
   case 41:
-#line 205 "syntax.y" /* yacc.c:1652  */
+#line 205 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-4]; 
         nodeBuffer[1]=yyvsp[-3]; 
@@ -1877,11 +1877,11 @@ yyreduce:
         nodeBuffer[4]=yyvsp[0]; 
         yyval=createNode(5,nodeBuffer,4,Stmt,(yyloc).first_line); 
     }
-#line 1881 "syntax.tab.c" /* yacc.c:1652  */
+#line 1881 "syntax.tab.c"
     break;
 
   case 42:
-#line 212 "syntax.y" /* yacc.c:1652  */
+#line 212 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-6]; 
         nodeBuffer[1]=yyvsp[-5]; 
@@ -1892,11 +1892,11 @@ yyreduce:
         nodeBuffer[6]=yyvsp[0]; 
         yyval=createNode(7,nodeBuffer,5,Stmt,(yyloc).first_line);
     }
-#line 1896 "syntax.tab.c" /* yacc.c:1652  */
+#line 1896 "syntax.tab.c"
     break;
 
   case 43:
-#line 221 "syntax.y" /* yacc.c:1652  */
+#line 221 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-4]; 
         nodeBuffer[1]=yyvsp[-3]; 
@@ -1905,35 +1905,35 @@ yyreduce:
         nodeBuffer[4]=yyvsp[0]; 
         yyval=createNode(5,nodeBuffer,6,Stmt,(yyloc).first_line); 
     }
-#line 1909 "syntax.tab.c" /* yacc.c:1652  */
+#line 1909 "syntax.tab.c"
     break;
 
   case 44:
-#line 228 "syntax.y" /* yacc.c:1652  */
+#line 228 "syntax.y"
     { 
         errorTypeB((yyloc).first_line, 2);
     }
-#line 1917 "syntax.tab.c" /* yacc.c:1652  */
+#line 1917 "syntax.tab.c"
     break;
 
   case 45:
-#line 230 "syntax.y" /* yacc.c:1652  */
+#line 230 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 3);
     }
-#line 1925 "syntax.tab.c" /* yacc.c:1652  */
+#line 1925 "syntax.tab.c"
     break;
 
   case 46:
-#line 232 "syntax.y" /* yacc.c:1652  */
+#line 232 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 4);
     }
-#line 1933 "syntax.tab.c" /* yacc.c:1652  */
+#line 1933 "syntax.tab.c"
     break;
 
   case 47:
-#line 234 "syntax.y" /* yacc.c:1652  */
+#line 234 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
@@ -1941,215 +1941,215 @@ yyreduce:
         errorTypeB((yyloc).first_line, 0);
         yyerrok;
     }
-#line 1945 "syntax.tab.c" /* yacc.c:1652  */
+#line 1945 "syntax.tab.c"
     break;
 
   case 48:
-#line 241 "syntax.y" /* yacc.c:1652  */
+#line 241 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,1,DefList,(yyloc).first_line); 
     }
-#line 1955 "syntax.tab.c" /* yacc.c:1652  */
+#line 1955 "syntax.tab.c"
     break;
 
   case 49:
-#line 245 "syntax.y" /* yacc.c:1652  */
+#line 245 "syntax.y"
     {
         yyval=createNode(0,NULL,2,DefList,(yyloc).first_line); 
     }
-#line 1963 "syntax.tab.c" /* yacc.c:1652  */
+#line 1963 "syntax.tab.c"
     break;
 
   case 50:
-#line 248 "syntax.y" /* yacc.c:1652  */
+#line 248 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,1,Def,(yyloc).first_line); 
     }
-#line 1974 "syntax.tab.c" /* yacc.c:1652  */
+#line 1974 "syntax.tab.c"
     break;
 
   case 51:
-#line 253 "syntax.y" /* yacc.c:1652  */
+#line 253 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 1);
     }
-#line 1982 "syntax.tab.c" /* yacc.c:1652  */
+#line 1982 "syntax.tab.c"
     break;
 
   case 52:
-#line 255 "syntax.y" /* yacc.c:1652  */
+#line 255 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 9);
     }
-#line 1990 "syntax.tab.c" /* yacc.c:1652  */
+#line 1990 "syntax.tab.c"
     break;
 
   case 53:
-#line 258 "syntax.y" /* yacc.c:1652  */
+#line 258 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,1,DecList,(yyloc).first_line); 
     }
-#line 1999 "syntax.tab.c" /* yacc.c:1652  */
+#line 1999 "syntax.tab.c"
     break;
 
   case 54:
-#line 261 "syntax.y" /* yacc.c:1652  */
+#line 261 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,2,DecList,(yyloc).first_line); 
     }
-#line 2010 "syntax.tab.c" /* yacc.c:1652  */
+#line 2010 "syntax.tab.c"
     break;
 
   case 55:
-#line 267 "syntax.y" /* yacc.c:1652  */
+#line 267 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,1,Dec,(yyloc).first_line); 
     }
-#line 2019 "syntax.tab.c" /* yacc.c:1652  */
+#line 2019 "syntax.tab.c"
     break;
 
   case 56:
-#line 270 "syntax.y" /* yacc.c:1652  */
+#line 270 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,2,Dec,(yyloc).first_line); 
     }
-#line 2030 "syntax.tab.c" /* yacc.c:1652  */
+#line 2030 "syntax.tab.c"
     break;
 
   case 57:
-#line 276 "syntax.y" /* yacc.c:1652  */
+#line 276 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,1,Exp,(yyloc).first_line); 
     }
-#line 2041 "syntax.tab.c" /* yacc.c:1652  */
+#line 2041 "syntax.tab.c"
     break;
 
   case 58:
-#line 281 "syntax.y" /* yacc.c:1652  */
+#line 281 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,2,Exp,(yyloc).first_line); 
     }
-#line 2052 "syntax.tab.c" /* yacc.c:1652  */
+#line 2052 "syntax.tab.c"
     break;
 
   case 59:
-#line 286 "syntax.y" /* yacc.c:1652  */
+#line 286 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,3,Exp,(yyloc).first_line); 
     }
-#line 2063 "syntax.tab.c" /* yacc.c:1652  */
+#line 2063 "syntax.tab.c"
     break;
 
   case 60:
-#line 291 "syntax.y" /* yacc.c:1652  */
+#line 291 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,4,Exp,(yyloc).first_line); 
     }
-#line 2074 "syntax.tab.c" /* yacc.c:1652  */
+#line 2074 "syntax.tab.c"
     break;
 
   case 61:
-#line 296 "syntax.y" /* yacc.c:1652  */
+#line 296 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,5,Exp,(yyloc).first_line); 
     }
-#line 2085 "syntax.tab.c" /* yacc.c:1652  */
+#line 2085 "syntax.tab.c"
     break;
 
   case 62:
-#line 301 "syntax.y" /* yacc.c:1652  */
+#line 301 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,6,Exp,(yyloc).first_line); 
     }
-#line 2096 "syntax.tab.c" /* yacc.c:1652  */
+#line 2096 "syntax.tab.c"
     break;
 
   case 63:
-#line 306 "syntax.y" /* yacc.c:1652  */
+#line 306 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,7,Exp,(yyloc).first_line); 
     }
-#line 2107 "syntax.tab.c" /* yacc.c:1652  */
+#line 2107 "syntax.tab.c"
     break;
 
   case 64:
-#line 311 "syntax.y" /* yacc.c:1652  */
+#line 311 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,8,Exp,(yyloc).first_line); 
     }
-#line 2118 "syntax.tab.c" /* yacc.c:1652  */
+#line 2118 "syntax.tab.c"
     break;
 
   case 65:
-#line 316 "syntax.y" /* yacc.c:1652  */
+#line 316 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,9,Exp,(yyloc).first_line);
     }
-#line 2129 "syntax.tab.c" /* yacc.c:1652  */
+#line 2129 "syntax.tab.c"
     break;
 
   case 66:
-#line 321 "syntax.y" /* yacc.c:1652  */
+#line 321 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,10,Exp,(yyloc).first_line); 
     }
-#line 2139 "syntax.tab.c" /* yacc.c:1652  */
+#line 2139 "syntax.tab.c"
     break;
 
   case 67:
-#line 325 "syntax.y" /* yacc.c:1652  */
+#line 325 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-1]; 
         nodeBuffer[1]=yyvsp[0]; 
         yyval=createNode(2,nodeBuffer,11,Exp,(yyloc).first_line); 
     }
-#line 2149 "syntax.tab.c" /* yacc.c:1652  */
+#line 2149 "syntax.tab.c"
     break;
 
   case 68:
-#line 329 "syntax.y" /* yacc.c:1652  */
+#line 329 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-3]; 
         nodeBuffer[1]=yyvsp[-2]; 
@@ -2157,22 +2157,22 @@ yyreduce:
         nodeBuffer[3]=yyvsp[0]; 
         yyval=createNode(4,nodeBuffer,12,Exp,(yyloc).first_line); 
     }
-#line 2161 "syntax.tab.c" /* yacc.c:1652  */
+#line 2161 "syntax.tab.c"
     break;
 
   case 69:
-#line 335 "syntax.y" /* yacc.c:1652  */
+#line 335 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,13,Exp,(yyloc).first_line); 
     }
-#line 2172 "syntax.tab.c" /* yacc.c:1652  */
+#line 2172 "syntax.tab.c"
     break;
 
   case 70:
-#line 340 "syntax.y" /* yacc.c:1652  */
+#line 340 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-3]; 
         nodeBuffer[1]=yyvsp[-2]; 
@@ -2180,94 +2180,95 @@ yyreduce:
         nodeBuffer[3]=yyvsp[0]; 
         yyval=createNode(4,nodeBuffer,14,Exp,(yyloc).first_line); 
     }
-#line 2184 "syntax.tab.c" /* yacc.c:1652  */
+#line 2184 "syntax.tab.c"
     break;
 
   case 71:
-#line 346 "syntax.y" /* yacc.c:1652  */
+#line 346 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,15,Exp,(yyloc).first_line); 
     }
-#line 2195 "syntax.tab.c" /* yacc.c:1652  */
+#line 2195 "syntax.tab.c"
     break;
 
   case 72:
-#line 351 "syntax.y" /* yacc.c:1652  */
+#line 351 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,16,Exp,(yyloc).first_line); 
     }
-#line 2204 "syntax.tab.c" /* yacc.c:1652  */
+#line 2204 "syntax.tab.c"
     break;
 
   case 73:
-#line 354 "syntax.y" /* yacc.c:1652  */
+#line 354 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,17,Exp,(yyloc).first_line); 
     }
-#line 2213 "syntax.tab.c" /* yacc.c:1652  */
+#line 2213 "syntax.tab.c"
     break;
 
   case 74:
-#line 357 "syntax.y" /* yacc.c:1652  */
+#line 357 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,18,Exp,(yyloc).first_line); 
     }
-#line 2222 "syntax.tab.c" /* yacc.c:1652  */
+#line 2222 "syntax.tab.c"
     break;
 
   case 75:
-#line 360 "syntax.y" /* yacc.c:1652  */
+#line 360 "syntax.y"
     {
         yyval = createNode(0, nodeBuffer,19,Exp,(yyloc).first_line); 
         errorTypeB((yyloc).first_line, 5);
     }
-#line 2231 "syntax.tab.c" /* yacc.c:1652  */
+#line 2231 "syntax.tab.c"
     break;
 
   case 76:
-#line 363 "syntax.y" /* yacc.c:1652  */
+#line 363 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 21);
     }
-#line 2239 "syntax.tab.c" /* yacc.c:1652  */
+#line 2239 "syntax.tab.c"
     break;
 
   case 77:
-#line 365 "syntax.y" /* yacc.c:1652  */
+#line 365 "syntax.y"
     {
         errorTypeB((yyloc).first_line, 21);
     }
-#line 2247 "syntax.tab.c" /* yacc.c:1652  */
+#line 2247 "syntax.tab.c"
     break;
 
   case 78:
-#line 368 "syntax.y" /* yacc.c:1652  */
+#line 368 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[-2]; 
         nodeBuffer[1]=yyvsp[-1]; 
         nodeBuffer[2]=yyvsp[0]; 
         yyval=createNode(3,nodeBuffer,1,Args,(yyloc).first_line); 
     }
-#line 2258 "syntax.tab.c" /* yacc.c:1652  */
+#line 2258 "syntax.tab.c"
     break;
 
   case 79:
-#line 373 "syntax.y" /* yacc.c:1652  */
+#line 373 "syntax.y"
     {
         nodeBuffer[0]=yyvsp[0]; 
         yyval=createNode(1,nodeBuffer,2,Args,(yyloc).first_line); 
     }
-#line 2267 "syntax.tab.c" /* yacc.c:1652  */
+#line 2267 "syntax.tab.c"
     break;
 
 
-#line 2271 "syntax.tab.c" /* yacc.c:1652  */
+#line 2271 "syntax.tab.c"
+
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2504,7 +2505,7 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 377 "syntax.y" /* yacc.c:1918  */
+#line 377 "syntax.y"
 
 
 void yyerror(char* msg){
@@ -2523,13 +2524,8 @@ int main(int argc,char** argv){
     yyrestart(f);
     yyparse();
     if(ok){
-        //printTree(nodeBuffer[0],0);
-        printf("Syntax OK!\n");
         semAnalysis(nodeBuffer[0]);
         printInterCodeList(NULL, NULL);
-		//FILE* file = fopen("tree.txt", "w");
-		//putSyntaxTreeToFile(file, nodeBuffer[0]);
-		//fclose(file);
     }
     return 0;
 }

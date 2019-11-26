@@ -1,0 +1,6 @@
+FUNCTION main :
+v1 := #7
+v2 := #4
+v2 := #5
+WRITE v2
+RETURN #0
