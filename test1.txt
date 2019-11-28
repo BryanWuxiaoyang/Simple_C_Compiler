@@ -1,12 +1,52 @@
-int f(int i)
+void Swap(int low, int high)
 {
-   return f(i-1);
+    int temp;
+    temp = arr[low];
+    arr[low] = arr[high];
+    arr[high] = temp;
+}
+int Partition(int low, int high)
+{
+    int base = arr[low];
+    while(low < high)
+    {
+        while(low < high && arr[high] >= base)
+        {
+            high=high-1;
+        }
+        Swap(low, high);
+        while(low < high && arr[low] <= base)
+        {
+            low=low+1;
+        }
+        Swap(low, high);
+    }
+    return low;
+}
+void QuickSort(int low, int high)
+{
+    if(low < high)
+    {
+        int base = Partition(low, high);
+        QuickSort(low, base - 1);
+        QuickSort(base + 1, high);
+    }
 }
 int main()
 {
-    int i, j;
-    i=read();
-    j=f(i);
-    write(j);
+    int n;
+    n=read();
+    int i=0, j=0;
+    while(i<n)
+    {
+        arr[i]=read();
+        i=i+1;
+    }
+    QuickSort(0, n-1);
+    while(j<n)
+    {
+        write(arr[j]);
+        j=j+1;
+    }
     return 0;
 }
