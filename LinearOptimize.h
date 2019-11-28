@@ -1,3 +1,4 @@
+#pragma once
 #include "IntermediateLanguage.h"
 #include <stdlib.h>
 #include <string.h>
@@ -35,7 +36,7 @@ void addUniNode(UniNodeList* list, void* value){
     UniNode* cur;
     for(cur=list->head;cur!=list->rear;cur=cur->next);
     cur->value=value;
-    UniNode* newUnNode=createUniNodeList(NULL,NULL);
+    UniNode* newUnNode=createUniNode(NULL,NULL);
     cur->next=newUnNode;
     list->rear=newUnNode;
 }
@@ -78,6 +79,7 @@ int isSameSym(char* name,SymChecker* sym){
     return strcmp(name,sym->symName)==0;
 }
 
+
 SymChecker* searchSymList(char* name,UniNodeList* list){
     for(UniNode* cur=list->head;cur!=list->rear;cur=cur->next)
         if(isSameSym(name,cur->value))
@@ -105,6 +107,7 @@ void processCodePart(char* name,UniNodeList* symList,int* lineno,CodePart codePa
     else if(codePart==TARGET)//赋值
         addUniNode(symChecker->assignTable,lineno);
 }
+
 
 void processCode(InterCode code,int lineno,UniNodeList* symList){
     //装载各种引用表和赋值表 
@@ -161,6 +164,7 @@ void processCode(InterCode code,int lineno,UniNodeList* symList){
             break;
     }
 }
+
 
 void deleteUselessCode(UniNodeList* symList,ListIterator it){
     //情况1：无效代码，给了个变量赋值或计算，后面压根没用它
@@ -237,16 +241,29 @@ void processUselessCode(UniNodeList* symList,ListIterator it){
 void processUselessCode2(ListIterator it){
     while(MyList_hasNext(it)){
         InterCode code=(InterCode)MyList_getNext(it);
-        InterCode curCode;
 	    char* target = code->target;
         char* arg1=code->arg1;
-        if(curCode==ILOP_CALL){
+        if(code->op==ILOP_CALL){
             InterCode nextCode=(InterCode)MyList_getNext(it);
             char* nextArg1=nextCode->arg1;
+            char* nextTarget=nextCode->target;
             if(nextCode->op==ILOP_ASSIGN&&strcmp(target,nextArg1)==0){
-                nextCode->op=ILOP_CALL;
-                strcpy(nextArg1,arg1);
+                strcpy(target,nextTarget);
+                MyList_removePrev(it);
             }
+        }
+        if(code->op==ILOP_RETURN){
+            MyList_getPrev(it);
+            InterCode prevCode=(InterCode)MyList_getPrev(it);
+            char* prevArg1=prevCode->arg1;
+            char* prevTarget=prevCode->target;
+            if(prevCode->op==ILOP_ASSIGN&&strcmp(target,prevTarget)==0){
+                strcpy(target,prevArg1);
+                MyList_removeNext(it);
+            }
+            else
+                MyList_getNext(it);
+            MyList_getNext(it);
         }
     }
 }
@@ -259,17 +276,18 @@ UniNodeList* getCodeList(ListIterator it){
         processCode(code,cur,symList);
         cur++;
 	}
+    return symList;
 }
 
-void optimizeInterCodeLinear() {
-	ListIterator it = MyList_createIterator(interCodeList);
-    UniNodeList* symList=getCodeList(it);
+void optimizeInterCodeLinear(){	
+    ListIterator it = MyList_createIterator(interCodeList);
+    //UniNodeList* symList=getCodeList(it);
     it=MyList_createIterator(interCodeList);
     //processUselessCode(symList,it);//处理情况2和3，过程中不会删除代码，只会修改，处理之后会产生一些无效的赋值或计算；但是这样没有考虑循环和分支，有不少问题
     processUselessCode2(it);
-    it=MyList_createIterator(interCodeList);
-    UniNodeList* newSymList=getCodeList(it);
-    it=MyList_createIterator(interCodeList);
-    deleteUselessCode(newSymList,it);//此时统一删除所有无效代码
+    //it=MyList_createIterator(interCodeList);
+    //UniNodeList* newSymList=getCodeList(it);
+    //it=MyList_createIterator(interCodeList);
+    //deleteUselessCode(newSymList,it);//此时统一删除所有无效代码
 	MyList_destroyIterator(it);
 }

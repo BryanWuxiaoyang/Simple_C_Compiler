@@ -1,8 +1,10 @@
+FUNCTION pb :
+RETURN #4
+FUNCTION pc :
+v1 := CALL pb
+t2 := v1 + #5
+RETURN t2
 FUNCTION main :
-READ t1
-v3 := t1
-v1 := #7
-v2 := #4
-v2 := #5
-WRITE #5
+t3 := CALL pc
+WRITE t3
 RETURN #0

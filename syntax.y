@@ -3,7 +3,9 @@
     #include <string.h>
     #include "lex.yy.c"
     #include "SemanticAnalysis.h"
-    #include "IntermediateLanguage.h"
+   #include "IntermediateLanguage.h"
+    #include "LinearOptimize.h"
+
     void yyerror(char* msg);
     Node nodeBuffer[8];
     void errorTypeB(int lineno,int errorId){
@@ -395,6 +397,7 @@ int main(int argc,char** argv){
     if(ok){
         putSyntaxTreeToFile(file, nodeBuffer[0]);
         semAnalysis(nodeBuffer[0]);
+        optimizeInterCodeLinear();
         printInterCodeList(NULL, NULL);
     }
     fclose(file);

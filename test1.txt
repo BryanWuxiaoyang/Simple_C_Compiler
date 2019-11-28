@@ -1,0 +1,12 @@
+int f(int i)
+{
+   return f(i-1);
+}
+int main()
+{
+    int i, j;
+    i=read();
+    j=f(i);
+    write(j);
+    return 0;
+}

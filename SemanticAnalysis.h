@@ -463,7 +463,7 @@ void SM_VarList(Node node, ListHead ret_symList) {
 
 		SM_ParamDec(paramDecNode, &sym, &handler);
 
-		if (sym->type->kind == STRUCTURE) {// ½«½á¹¹ÌåÐÍµÄ²ÎÊý×ª»»³ÉÆäÖ¸Õë
+		if (sym->type->kind == STRUCTURE) {// ï¿½ï¿½ï¿½á¹¹ï¿½ï¿½ï¿½ÍµÄ²ï¿½ï¿½ï¿½×ªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö¸ï¿½ï¿½
 			sym->type = createType_addr(sym->type);
 			insertType(getCurTypeTable(), sym->type);
 		}
@@ -585,7 +585,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 		SM_Exp(expNode, &handler, trueList, nextList, 1, 0);
 
 		if (isConstASTNode(getASTNode(handler)) && getConstInt(getConstValue(getASTNode(handler))) == 1) {
-			if (MyList_isEmpty(trueList) == false) {
+			if (MyList_isEmpty(trueList) == 0) {
 				ListIterator it = MyList_createIterator(trueList);
 				while (MyList_hasNext(it)) {
 					InterCode code = (InterCode)MyList_getNext(it);
@@ -603,7 +603,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			}
 
 #ifdef VAR_CONST_OPTMIZATION
-			// ´¢´æ½øÈë·ÖÖ§Ç°µÄ½ÚµãµÄ³£Á¿×´Ì¬
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö§Ç°ï¿½Ä½Úµï¿½Ä³ï¿½ï¿½ï¿½×´Ì¬
 			struct _ConstVar_ {
 				ASTNodeHandler handler;
 				ConstValue value;
@@ -628,7 +628,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			popInnerASTTable();
 
 #ifdef VAR_CONST_OPTMIZATION
-			// ½«ËùÓÐ±»¸Ä±ä³£Á¿×´Ì¬µÄ½ÚµãÖÃÎª·Ç³£Á¿
+			// ï¿½ï¿½ï¿½ï¿½ï¿½Ð±ï¿½ï¿½Ä±ä³£ï¿½ï¿½×´Ì¬ï¿½Ä½Úµï¿½ï¿½ï¿½Îªï¿½Ç³ï¿½ï¿½ï¿½
 			ListIterator constIt = MyList_createIterator(constList);
 			while (MyList_hasNext(constIt)) {
 				ConstVar constVar = (ConstVar)MyList_getNext(constIt);
@@ -705,7 +705,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			}
 
 #ifdef VAR_CONST_OPTMIZATION
-			// ´¢´æ½øÈë·ÖÖ§Ç°µÄ½ÚµãµÄ³£Á¿×´Ì¬
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö§Ç°ï¿½Ä½Úµï¿½Ä³ï¿½ï¿½ï¿½×´Ì¬
 			struct _ConstVar_ {
 				ASTNodeHandler handler;
 				ConstValue value;
@@ -726,7 +726,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 #endif
 
 #ifdef SUB_EXP_OPTMIZATION
-			// ´æ´¢µ±Ç°µÄ×Ó±í´ïÊ½ÁÐ±í
+			// ï¿½æ´¢ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½Ê½ï¿½Ð±ï¿½
 			ListHead backUpInnerTableList = getBackUpInnerTableList();
 #endif
 
@@ -736,7 +736,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 
 
 #ifdef VAR_CONST_OPTMIZATION
-			// ÔÝÊ±»Ö¸´½ÚµãµÄ³£±äÁ¿×´Ì¬£¬²¢½«³£±äÁ¿×´Ì¬±»¸ü¸ÄµÄ½ÚµãÉèÖÃÔ¤É¾³ý±ê¼Ç
+			// ï¿½ï¿½Ê±ï¿½Ö¸ï¿½ï¿½Úµï¿½Ä³ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ÄµÄ½Úµï¿½ï¿½ï¿½ï¿½ï¿½Ô¤É¾ï¿½ï¿½ï¿½ï¿½ï¿½
 			ListIterator constIt = MyList_createIterator(constList);
 			while (MyList_hasNext(constIt)) {
 				ConstVar constVar = (ConstVar)MyList_getNext(constIt);
@@ -750,11 +750,11 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 
 
 #ifdef SUB_EXP_OPTMIZATION
-			// µÚÒ»¸ö·ÖÖ§½áÊø£¬½»»»µ±Ç°±íºÍ±¸·Ý±í£¬´ËÊ±±¸·Ý±íÖÐ´¢´æµÚÒ»¸ö·ÖÖ§´¦Àí¹ýºóµÄ±í
+			// ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ç°ï¿½ï¿½ï¿½Í±ï¿½ï¿½Ý±ï¿½ï¿½ï¿½ï¿½ï¿½Ê±ï¿½ï¿½ï¿½Ý±ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½
 			switchInnerTableList(&backUpInnerTableList);
 #endif
 
-			InterCode nextCode = createInterCode(NULL, NULL, NULL, ILOP_GOTO); // µÚÒ»¸ö·ÖÖ§ÅªÍê»áÌøµ½stmtµÄnext
+			InterCode nextCode = createInterCode(NULL, NULL, NULL, ILOP_GOTO); // ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ö§Åªï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½stmtï¿½ï¿½next
 			appendInterCode(nextCode);
 			MyList_pushElem(nextList, nextCode);
 			
@@ -767,7 +767,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			popInnerASTTable();
 			
 #ifdef VAR_CONST_OPTMIZATION
-			// Çå³ýËùÓÐÔÚÁ½¸ö·ÖÖ§ÖÐ£¬³£Á¿×´Ì¬¸Ä±ä¹ýµÄ½ÚµãµÄ³£Á¿×´Ì¬
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½Ð£ï¿½ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½Ä±ï¿½ï¿½ï¿½Ä½Úµï¿½Ä³ï¿½ï¿½ï¿½×´Ì¬
 			constIt = MyList_createIterator(constList);
 			while (MyList_hasNext(constIt)) {
 				ConstVar constVar = (ConstVar)MyList_getNext(constIt);
@@ -781,7 +781,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 #endif
 
 #ifdef SUB_EXP_OPTMIZATION
-			// ½«±¸·Ý±í£¨µÚÒ»¸ö·ÖÖ§½áÊøºóµÄ±í£©Óëµ±Ç°±í£¨µÚ¶þ¸ö·ÖÖ§½áÊøºóµÄ±í£©ºÏ²¢£¬È¡½»¼¯£¬¼´ÎªÁ½´Î·ÖÖ§ºóÊ£ÓàµÄ×Ó±í´ïÊ½±í
+			// ï¿½ï¿½ï¿½ï¿½ï¿½Ý±ï¿½ï¿½ï¿½ï¿½ï¿½Ò»ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½ëµ±Ç°ï¿½ï¿½ï¿½ï¿½ï¿½Ú¶ï¿½ï¿½ï¿½ï¿½ï¿½Ö§ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä±ï¿½ï¿½ï¿½ï¿½Ï²ï¿½ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Îªï¿½ï¿½ï¿½Î·ï¿½Ö§ï¿½ï¿½Ê£ï¿½ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½Ê½ï¿½ï¿½
 			mergeInnerTableList_intersect(backUpInnerTableList);
 			destroyInnerTableList(backUpInnerTableList);
 #endif
@@ -840,12 +840,12 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			ListHead assignedHandlerList = MyList_createList();
 
 #ifdef SUB_EXP_OPTMIZATION
-			// ËùÓÐµÄÍâ²¿×Ó±í´ïÊ½²»ÄÜÔÚwhileÓï¾ä¿éÖÐÊ¹ÓÃ
+			// ï¿½ï¿½ï¿½Ðµï¿½ï¿½â²¿ï¿½Ó±ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½whileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
 			clearInnerASTNodes();
 #endif
 
 #ifdef VAR_CONST_OPTMIZATION
-			// ËùÓÐ·ÇÁ¢¼´ÊýµÄÍâ²¿³£Á¿×´Ì¬¶¼²»ÄÜÔÚwhileÓï¾ä¿éÖÐÊ¹ÓÃ
+			// ï¿½ï¿½ï¿½Ð·ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½â²¿ï¿½ï¿½ï¿½ï¿½×´Ì¬ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½whileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ê¹ï¿½ï¿½
 			AllASTNodeIterator it = createAllASTNodeIterator();
 			while (hasNextAllASTNode(it)) {
 				ASTNodeHandler handler = getNextAllASTNode(it);
@@ -863,7 +863,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 
 
 #ifdef VAR_CONST_OPTMIZATION
-			// ËùÓÐÔÚwhileÓï¾ä¿éÖÐÉú³ÉµÄ³£Á¿¶¼²»ÄÜ±»Ê¹ÓÃ
+			// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½whileï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÉµÄ³ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ü±ï¿½Ê¹ï¿½ï¿½
 			it = createAllASTNodeIterator();
 			while (hasNextAllASTNode(it)) {
 				ASTNodeHandler handler = getNextAllASTNode(it);
@@ -1130,6 +1130,7 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 			ILOP ilop = getAlgorithmOP(op);
 			InterCode code = createInterCode(getASTNodeStr_r(getASTNode(handler1)), getASTNodeStr_r(getASTNode(handler2)), getASTNodeStr_r(getASTNode(resHandler)), ilop);
 			appendInterCode(code);
+			printInterCode(code, NULL, NULL);
 		}
 	}
 	else if (node->expandNo == 9) {// LP Exp RP
@@ -1306,7 +1307,7 @@ void SM_Args(Node node, ListHead ret_handlerList) {
 		ASTNodeHandler handler = NULL;
 		SM_Exp(expNode, &handler, NULL, NULL, 0, 0);
 
-		if (getASTNode(handler)->value.sym->type->kind == STRUCTURE) {
+		if (getASTNode(handler)->type == AST_SYM && getASTNode(handler)->value.sym->type->kind == STRUCTURE) {
 			clearParents(getASTNode(handler));
 			handler = createASTNode_op(OP_REF, getASTNode(handler), NULL);
 		}
