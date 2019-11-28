@@ -1,7 +1,6 @@
 int main()
 {
-    int k,b,c,s;
+    int k,c,s;
     k=c+s;
-    b=c+s+k;
     return 0;
 }

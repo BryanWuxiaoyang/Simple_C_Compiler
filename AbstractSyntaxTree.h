@@ -12,9 +12,9 @@
 #include "ASTNode.h"
 #include "ASTNodeHandler.h"
 
-//#define VAR_CONST_OPTMIZATION
+#define VAR_CONST_OPTMIZATION
 
-//#define CONST_VALUE_OPTMIZATION
+#define CONST_VALUE_OPTMIZATION
 
 #define SUB_EXP_OPTMIZATION
 

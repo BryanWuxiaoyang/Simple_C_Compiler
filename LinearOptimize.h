@@ -238,7 +238,8 @@ void processUselessCode(UniNodeList* symList,ListIterator it){
     }
 }
 
-void processUselessCode2(ListIterator it){
+void processUselessCode2(ListIterator it,UniNodeList* symList){
+    int lineno=0;
     while(MyList_hasNext(it)){
         InterCode code=(InterCode)MyList_getNext(it);
 	    char* target = code->target;
@@ -247,10 +248,13 @@ void processUselessCode2(ListIterator it){
             InterCode nextCode=(InterCode)MyList_getNext(it);
             char* nextArg1=nextCode->arg1;
             char* nextTarget=nextCode->target;
-            if(nextCode->op==ILOP_ASSIGN&&strcmp(target,nextArg1)==0){
+            SymChecker* symTarget=searchSymList(target,symList);
+            int nextUse=searchLine(symTarget,lineno+1,USETAB);
+            if(nextCode->op==ILOP_ASSIGN&&nextUse>=INF&&strcmp(target,nextArg1)==0){
                 strcpy(target,nextTarget);
                 MyList_removePrev(it);
             }
+            lineno++;
         }
         if(code->op==ILOP_RETURN){
             MyList_getPrev(it);
@@ -265,6 +269,7 @@ void processUselessCode2(ListIterator it){
                 MyList_getNext(it);
             MyList_getNext(it);
         }
+        lineno++;
     }
 }
 
@@ -284,7 +289,7 @@ void optimizeInterCodeLinear(){
     UniNodeList* symList=getCodeList(it);
     it=MyList_createIterator(interCodeList);
     //processUselessCode(symList,it);//处理情况2和3，过程中不会删除代码，只会修改，处理之后会产生一些无效的赋值或计算；但是这样没有考虑循环和分支，有不少问题
-    processUselessCode2(it);
+    processUselessCode2(it,symList);
     //it=MyList_createIterator(interCodeList);
     //UniNodeList* newSymList=getCodeList(it);
     //it=MyList_createIterator(interCodeList);

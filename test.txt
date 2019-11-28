@@ -1,32 +1,17 @@
+struct P
+{
+    int a;
+    int b;
+};
+int f(struct P p)
+{
+    p.a=0;
+    p.b=p.a+p.a;
+    return 0;
+}
 int main()
 {
-    int a[10],i=0,j=0;
-    while(i<10)
-    {
-        a[i]=read();
-        i=i+1;
-    }
-    i=0;
-    while(i<10)
-    {
-        while(j<9)
-        {
-            if(a[j]>a[j+1])
-            {
-                int t=a[j];
-                a[j]=a[j+1];
-                a[j+1]=t;
-            }
-            j=j+1;
-        }
-        i=i+1;
-        j=0;
-    }
-    i=0;
-    while(i<10)
-    {
-        write(a[i]);
-        i=i+1;
-    }
+    struct P k;
+    write(f(k));
     return 0;
 }

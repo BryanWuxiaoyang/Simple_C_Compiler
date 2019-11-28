@@ -6,9 +6,9 @@
 #include <stdio.h>
 #include <assert.h>
 
-//#define ASTNODE_MEMORY_MANAGE_ENABLE
+#define ASTNODE_MEMORY_MANAGE_ENABLE
 
-//#define MEMORY_FREE_ENABLE;
+#define MEMORY_FREE_ENABLE;
 
 struct _ASTNodeHandler_ {
 	ASTNode node;
