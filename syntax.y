@@ -396,10 +396,11 @@ int main(int argc,char** argv){
     FILE* file = fopen("temp.txt","w");
     if(ok){
         putSyntaxTreeToFile(file, nodeBuffer[0]);
+        fclose(file);
         semAnalysis(nodeBuffer[0]);
+        printInterCodeList(NULL,NULL);
         optimizeInterCodeLinear();
         printInterCodeList(NULL, NULL);
     }
-    fclose(file);
     return 0;
 }

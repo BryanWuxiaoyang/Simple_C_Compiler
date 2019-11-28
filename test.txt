@@ -3,15 +3,9 @@ struct P
     int a;
     int b;
 };
-int f(struct P p)
-{
-    p.a=0;
-    p.b=p.a+p.a;
-    return 0;
-}
 int main()
 {
-    struct P k;
-    write(f(k));
+    struct P ar[10];
+    ar[2].a=0;
     return 0;
 }

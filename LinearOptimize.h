@@ -95,7 +95,7 @@ typedef enum CodePart CodePart;
 
 void processCodePart(char* name,UniNodeList* symList,int* lineno,CodePart codePart){
     //TODO：还缺少指针，标签以及引用
-    if(name[0]!='#')
+    if(name[0]=='#')
         return;//立即数不参与优化处理
     SymChecker* symChecker=searchSymList(name,symList);
     if(symChecker==NULL){
@@ -249,7 +249,7 @@ void processUselessCode2(ListIterator it,UniNodeList* symList){
             char* nextArg1=nextCode->arg1;
             char* nextTarget=nextCode->target;
             SymChecker* symTarget=searchSymList(target,symList);
-            int nextUse=searchLine(symTarget,lineno+1,USETAB);
+            int nextUse=searchLine(symTarget,lineno+2,USETAB);
             if(nextCode->op==ILOP_ASSIGN&&nextUse>=INF&&strcmp(target,nextArg1)==0){
                 strcpy(target,nextTarget);
                 MyList_removePrev(it);

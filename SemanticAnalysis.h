@@ -1220,6 +1220,7 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		ASTNodeHandler offsetHandler = createASTNode_op(OP_STAR, getASTNode(handler2), getASTNode(elemSizeHandler));
 		ASTNodeHandler addHandler = createASTNode_op(OP_PLUS, getASTNode(refHandler), getASTNode(offsetHandler));
 		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
+		getASTNode(derefHandler)->varType =  getASTNode(derefHandler)->varType->u.targetType;
 
 		getASTNode(handler1)->accessTag = 1;
 		getASTNode(handler2)->accessTag = 1;// 不需要再次输出计算过的东西
