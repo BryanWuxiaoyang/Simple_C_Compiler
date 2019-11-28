@@ -8,7 +8,7 @@
 
 #define ASTNODE_MEMORY_MANAGE_ENABLE
 
-#define MEMORY_FREE_ENABLE;
+#define MEMORY_FREE_ENABLE
 
 struct _ASTNodeHandler_ {
 	ASTNode node;
