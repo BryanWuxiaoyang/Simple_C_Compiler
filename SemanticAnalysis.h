@@ -585,7 +585,15 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 		SM_Exp(expNode, &handler, trueList, nextList, 1, 0);
 
 		if (isConstASTNode(getASTNode(handler)) && getConstInt(getConstValue(getASTNode(handler))) == 1) {
-				SM_Stmt(stmtNode, returnType, nextList);
+			if (MyList_isEmpty(trueList) == false) {
+				ListIterator it = MyList_createIterator(trueList);
+				while (MyList_hasNext(it)) {
+					InterCode code = (InterCode)MyList_getNext(it);
+					removeInterCode(code);
+				}
+				MyList_destroyIterator(it);
+			}
+			SM_Stmt(stmtNode, returnType, nextList);
 		}
 		else {
 			if (MyList_isEmpty(trueList) == 0) {
@@ -651,9 +659,43 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 		if (isConstASTNode(getASTNode(handler))) {
 			ConstValue value = getConstValue(getASTNode(handler));
 			if(getConstInt(value)){
-				SM_Stmt(stmtNode1, returnType, falseList);
+				if (MyList_isEmpty(trueList) == 0) {
+					ListIterator it = MyList_createIterator(trueList);
+					while (MyList_hasNext(it)) {
+						InterCode code = (InterCode)MyList_getNext(it);
+						removeInterCode(code);
+					}
+					MyList_destroyIterator(it);
+				}
+				if (MyList_isEmpty(falseList) == 0) {
+					ListIterator it = MyList_createIterator(falseList);
+					while (MyList_hasNext(it)) {
+						InterCode code = (InterCode)MyList_getNext(it);
+						removeInterCode(code);
+					}
+					MyList_destroyIterator(it);
+				}
+
+				SM_Stmt(stmtNode1, returnType, nextList);
 			}
 			else {
+				if (MyList_isEmpty(trueList) == 0) {
+					ListIterator it = MyList_createIterator(trueList);
+					while (MyList_hasNext(it)) {
+						InterCode code = (InterCode)MyList_getNext(it);
+						removeInterCode(code);
+					}
+					MyList_destroyIterator(it);
+				}
+				if (MyList_isEmpty(falseList) == 0) {
+					ListIterator it = MyList_createIterator(falseList);
+					while (MyList_hasNext(it)) {
+						InterCode code = (InterCode)MyList_getNext(it);
+						removeInterCode(code);
+					}
+					MyList_destroyIterator(it);
+				}
+
 				SM_Stmt(stmtNode2, returnType, nextList);
 			}
 		}
@@ -789,7 +831,7 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			ListIterator nextListIt = MyList_createIterator(nextList);
 			while (MyList_hasNext(nextListIt)) {
 				InterCode nextListCode = (InterCode)MyList_getNext(nextListIt);
-				removeCode(nextListCode);
+				removeInterCode(nextListCode);
 			}
 			MyList_destroyIterator(nextListIt);
 			MyList_clear(nextList);

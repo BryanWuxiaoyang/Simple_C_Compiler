@@ -137,7 +137,7 @@ InterCode getLastCode() {
 	return (InterCode)MyList_getBack(interCodeList);
 }
 
-int removeCode(InterCode code) {
+int removeInterCode(InterCode code) {
 	int suc = 0;
 	ListIterator it = MyList_createIterator(getInterCodeList());
 	while (MyList_hasNext(it)) {

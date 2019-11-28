@@ -2,7 +2,7 @@
 #include "SemanticAnalysis.h"
 #include <assert.h>
 int main() {
-	FILE* file = fopen("tree.txt", "r");
+	FILE* file = fopen("temp.txt", "r");
 	Node node = getSyntaxTreeFromFile(file);
 	semAnalysis(node);
 	fclose(file);
