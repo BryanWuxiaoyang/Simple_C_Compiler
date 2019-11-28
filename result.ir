@@ -1,6 +1,8 @@
 FUNCTION main :
+READ t1
+v3 := t1
 v1 := #7
 v2 := #4
 v2 := #5
-WRITE v2
+WRITE #5
 RETURN #0

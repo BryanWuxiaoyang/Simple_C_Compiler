@@ -1,6 +1,7 @@
 int main()
 {
-    int a,b;
+    int a,b,c;
+    c=read();
     a=7;
     b=4;
     if(a<b){
@@ -9,5 +10,6 @@ int main()
     else{
         b=b+1;
     }
+    write(b);
     return 0;
 }
