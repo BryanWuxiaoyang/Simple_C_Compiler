@@ -396,9 +396,9 @@ int main(int argc,char** argv){
     FILE* file = fopen("temp.txt","w");
     if(ok){
         putSyntaxTreeToFile(file, nodeBuffer[0]);
-        //semAnalysis(nodeBuffer[0]);
-        //optimizeInterCodeLinear();
-        //printInterCodeList(NULL, NULL);
+        semAnalysis(nodeBuffer[0]);
+        optimizeInterCodeLinear();
+        printInterCodeList(NULL, NULL);
     }
     fclose(file);
     return 0;

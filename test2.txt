@@ -1,5 +1,7 @@
 int main()
 {
-    int a[10];
-    a[1]=a[2+1]+1;
+    int k,b,c,s;
+    k=c+s;
+    b=c+s+k;
+    return 0;
 }

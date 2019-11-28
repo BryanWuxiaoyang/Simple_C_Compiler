@@ -243,10 +243,10 @@ void processUselessCode2(ListIterator it){
         InterCode code=(InterCode)MyList_getNext(it);
 	    char* target = code->target;
         char* arg1=code->arg1;
-        if(code->op==ILOP_CALL){
+        if(code->op==ILOP_CALL||code->op==ILOP_PLUS||code->op==ILOP_MINUS||code->op==ILOP_MUL||code->op==ILOP_DIV){
             InterCode nextCode=(InterCode)MyList_getNext(it);
-            char* nextArg1=nextCode->arg1;
-            char* nextTarget=nextCode->target;
+            const char* nextArg1=nextCode->arg1;
+            const char* nextTarget=nextCode->target;
             if(nextCode->op==ILOP_ASSIGN&&strcmp(target,nextArg1)==0){
                 strcpy(target,nextTarget);
                 MyList_removePrev(it);
