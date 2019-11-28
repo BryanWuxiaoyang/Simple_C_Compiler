@@ -465,6 +465,7 @@ void SM_VarList(Node node, ListHead ret_symList) {
 
 		if (sym->type->kind == STRUCTURE) {// ���ṹ���͵Ĳ���ת������ָ��
 			sym->type = createType_addr(sym->type);
+			getASTNode(handler)->varType = sym->type;
 			insertType(getCurTypeTable(), sym->type);
 		}
 		appendInterCode(createInterCode(NULL, NULL, getASTNodeStr_l(getASTNode(handler)), ILOP_PARAM));
@@ -481,6 +482,7 @@ void SM_VarList(Node node, ListHead ret_symList) {
 
 		if (sym->type->kind == STRUCTURE) {
 			sym->type = createType_addr(sym->type);
+			getASTNode(handler)->varType = sym->type;
 			insertType(getCurTypeTable(), sym->type);
 		}
 
@@ -1211,10 +1213,10 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		SM_Exp(expNode1, &handler1, NULL, NULL, 0, 0);
 		SM_Exp(expNode2, &handler2, NULL, NULL, 0, 0);
 
-		Sym sym = getASTNode(handler1)->value.sym;
+		Type type = getASTNode(handler1)->varType;
 
 		ASTNodeHandler refHandler = createASTNode_op(OP_REF, getASTNode(handler1), NULL);
-		ASTNodeHandler elemSizeHandler = createASTNode_integer(sym->type->u.array.elemType->size);
+		ASTNodeHandler elemSizeHandler = createASTNode_integer(type->u.array.elemType->size);
 		ASTNodeHandler offsetHandler = createASTNode_op(OP_STAR, getASTNode(handler2), getASTNode(elemSizeHandler));
 		ASTNodeHandler addHandler = createASTNode_op(OP_PLUS, getASTNode(refHandler), getASTNode(offsetHandler));
 		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
@@ -1232,17 +1234,20 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		ASTNodeHandler structSymHandler = NULL;
 		SM_Exp(expNode, &structSymHandler, NULL, NULL, 0, 0);
 
-		Sym structSym = getASTNode(structSymHandler)->value.sym;
 		Sym fieldSym = NULL;
+		Type varType = getASTNode(structSymHandler)->varType;
 		Type structType = NULL;
 		ASTNodeHandler refHandler = NULL;
-		if (structSym->type->kind == ADDR) {
+		if (varType->kind == ADDR) {
 			refHandler = structSymHandler;
-			structType = structSym->type->u.targetType;
+			structType = varType->u.targetType;
+		}
+		else if(varType->kind == STRUCTURE){
+			refHandler = createASTNode_op(OP_REF, getASTNode(structSymHandler), NULL);
+			structType = varType;
 		}
 		else {
-			refHandler = createASTNode_op(OP_REF, getASTNode(structSymHandler), NULL);
-			structType = structSym->type;
+			assert(0);
 		}
 
 		ListIterator handlerIt = MyList_createIterator(structType->u.fieldList);
@@ -1259,7 +1264,7 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		int offset = fieldSym->offset;
 		ASTNodeHandler offsetHandler = NULL;
 		ASTNodeHandler addHandler = NULL;
-		if (structSym->type->kind == ADDR) {
+		if (structType->kind == ADDR && offset == 0) {
 			addHandler = refHandler;
 		}
 		else {

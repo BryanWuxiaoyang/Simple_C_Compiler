@@ -468,7 +468,8 @@ ASTNodeHandler createASTNode_sym(Sym sym) {
 			createName_sym(),
 			NULL,
 			NULL,
-			MyList_createList()
+			MyList_createList(),
+			sym->type
 		);
 
 		handler = createASTNodeHandler(node);
@@ -487,7 +488,8 @@ ASTNodeHandler createASTNode_func(Func func) {
 			createName_temp(),
 			NULL,
 			NULL,
-			MyList_createList()
+			MyList_createList(),
+			func->returnType
 		);
 	ASTNodeHandler handler = createASTNodeHandler(node);
 	insertASTLeafNode(handler);
@@ -508,7 +510,8 @@ ASTNodeHandler createASTNode_integer(int v) {
 			itostr(v),
 			NULL,
 			NULL,
-			MyList_createList()
+			MyList_createList(),
+			integerType
 		);
 		handler = createASTNodeHandler(node);
 
@@ -535,7 +538,8 @@ ASTNodeHandler createASTNode_float(float v) {
 			ftostr(v),
 			NULL,
 			NULL,
-			MyList_createList()
+			MyList_createList(),
+			floatType
 		);
 		handler = createASTNodeHandler(node);
 
@@ -573,7 +577,10 @@ ASTNodeHandler createASTNode_op(OP op, ASTNode lc, ASTNode rc) {
 			createName_temp(),
 			lc,
 			rc,
-			MyList_createList()
+			MyList_createList(),
+			op == OP_DEREF ? lc->varType->u.targetType:
+			op == OP_REF ? createType_addr(lc->varType):
+			lc->varType
 		);
 		handler = createASTNodeHandler(node);
 		if (lc) MyList_pushElem(lc->parents, node);

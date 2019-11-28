@@ -137,7 +137,7 @@ Type createType_addr(Type targetType) {
 	Type type = (Type)malloc(sizeof(struct _Type_));
 	if (type) {
 		type->name = (char*)malloc(sizeof(char) * (strlen(targetType->name) + 10));
-		if (type->name)sprintf(type->name, "addr_%s", targetType->name);
+		if (type->name)sprintf(type->name, "_%s", targetType->name);
 		type->kind = ADDR;
 		type->size = 4;
 		type->u.targetType = targetType;
