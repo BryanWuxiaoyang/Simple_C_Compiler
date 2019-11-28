@@ -1218,12 +1218,13 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		ASTNodeHandler elemSizeHandler = createASTNode_integer(sym->type->u.array.elemType->size);
 		ASTNodeHandler offsetHandler = createASTNode_op(OP_STAR, getASTNode(handler2), getASTNode(elemSizeHandler));
 		ASTNodeHandler addHandler = createASTNode_op(OP_PLUS, getASTNode(refHandler), getASTNode(offsetHandler));
-		ASTNodeHandler resHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
+		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
 
+		getASTNode(handler1)->accessTag = 1;
 		getASTNode(handler2)->accessTag = 1;// 不需要再次输出计算过的东西
-		translateASTTree(getASTNode(resHandler));
+		translateASTTree(getASTNode(derefHandler));
 		
-		if (ret_handler)* ret_handler = resHandler;
+		if (ret_handler)* ret_handler = derefHandler;
 	}
 	else if (node->expandNo == 15) {// Exp DOT ID
 		Node expNode = node->child[0];
@@ -1259,7 +1260,7 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		int offset = fieldSym->offset;
 		ASTNodeHandler offsetHandler = NULL;
 		ASTNodeHandler addHandler = NULL;
-		if (offset == 0 && structSym->type->kind == ADDR) {
+		if (structSym->type->kind == ADDR) {
 			addHandler = refHandler;
 		}
 		else {
