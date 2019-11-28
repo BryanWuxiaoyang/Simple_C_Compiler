@@ -12,11 +12,11 @@
 #include "ASTNode.h"
 #include "ASTNodeHandler.h"
 
-#define VAR_CONST_OPTMIZATION
+//#define VAR_CONST_OPTMIZATION
 
-#define CONST_VALUE_OPTMIZATION
+//#define CONST_VALUE_OPTMIZATION
 
-#define SUB_EXP_OPTMIZATION
+//#define SUB_EXP_OPTMIZATION
 
 #define AST_MAX_HEIGHT 10
 
@@ -208,7 +208,7 @@ ListHead getASTNodeList(int height) {
 	else return getCurInnerASTTable()->handlerList;
 }
 
-ListHead getBackUpInnerTableList() {// »ñÈ¡×Ó±í´ïÊ½±íµÄÕûÌå±¸·Ý£¬ÒÔ¹©ifelseµÄ·ÖÖ§Ê¹ÓÃ
+ListHead getBackUpInnerTableList() {// ï¿½ï¿½È¡ï¿½Ó±ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½å±¸ï¿½Ý£ï¿½ï¿½Ô¹ï¿½ifelseï¿½Ä·ï¿½Ö§Ê¹ï¿½ï¿½
 	ListHead resTableList = MyList_createList();
 	ListIterator tableIt = MyList_createIterator(innerASTTableList);
 	while (MyList_hasNext(tableIt)) {
@@ -227,7 +227,7 @@ ListHead getBackUpInnerTableList() {// »ñÈ¡×Ó±í´ïÊ½±íµÄÕûÌå±¸·Ý£¬ÒÔ¹©ifelseµÄ·ÖÖ
 	return resTableList;
 }
 
-void switchInnerTableList(ListHead* tableList) {// ½«tableListµÄ±íÉèÎªµ±Ç°×Ó±í´ïÊ½±í£¬²¢½«Ö®Ç°µÄ×Ó±í´ïÊ½±í´«¸øtableList
+void switchInnerTableList(ListHead* tableList) {// ï¿½ï¿½tableListï¿½Ä±ï¿½ï¿½ï¿½Îªï¿½ï¿½Ç°ï¿½Ó±ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ö®Ç°ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½Ê½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½tableList
 	ListHead tmp = innerASTTableList;
 	innerASTTableList = *tableList;
 	*tableList = tmp;
@@ -244,7 +244,7 @@ void destroyInnerTableList(ListHead tableList) {
 	MyList_destroyList(tableList);
 }
 
-void mergeInnerTableList_intersect(ListHead tableList) {// ²ÉÓÃ½»¼¯µÄ·½Ê½£¬ºÏ²¢µô¸ÃtableList
+void mergeInnerTableList_intersect(ListHead tableList) {// ï¿½ï¿½ï¿½Ã½ï¿½ï¿½ï¿½ï¿½Ä·ï¿½Ê½ï¿½ï¿½ï¿½Ï²ï¿½ï¿½ï¿½ï¿½ï¿½tableList
 	ListIterator dstTableIt = MyList_createIterator(innerASTTableList);
 	ListIterator srcTableIt = MyList_createIterator(tableList);
 
@@ -279,7 +279,7 @@ void mergeInnerTableList_intersect(ListHead tableList) {// ²ÉÓÃ½»¼¯µÄ·½Ê½£¬ºÏ²¢µ
 	MyList_destroyIterator(srcTableIt);
 }
 
-void clearInnerASTNodes() { // É¾³ý×Ó±í´ïÊ½½Úµãhandler£¬²»É¾³ýtable
+void clearInnerASTNodes() { // É¾ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½Ê½ï¿½Úµï¿½handlerï¿½ï¿½ï¿½ï¿½É¾ï¿½ï¿½table
 	ListIterator tableIt = MyList_createIterator(innerASTTableList);
 	while (MyList_hasNext(tableIt)) {
 		ASTTable table = (ASTTable)MyList_getNext(tableIt);
@@ -404,7 +404,7 @@ int isConstCond(OP op, ASTNode node1, ASTNode node2) {
 	return 0;
 }
 
-void clearParents(ASTNode node) { // Çå³ý×Ó±í´ïÊ½¼ÇÂ¼£¬²»ÊÇÇå³ý½Úµã±¾Éí
+void clearParents(ASTNode node) { // ï¿½ï¿½ï¿½ï¿½Ó±ï¿½ï¿½ï¿½Ê½ï¿½ï¿½Â¼ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Úµã±¾ï¿½ï¿½
 	ListIterator parents_it = MyList_createIterator(node->parents);
 	while (MyList_hasNext(parents_it)) {
 		ASTNode pNode = (ASTNode)MyList_getNext(parents_it);
