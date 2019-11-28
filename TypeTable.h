@@ -90,6 +90,7 @@ void fillType_array(Type type, const char* name, Type elemType, int size) {
 	type->kind = ARRAY;
 	type->u.array.elemType = elemType;
 	type->u.array.size = size;
+	type->size = elemType->size * size;
 }
 
 void fillType_structure(Type type, const char* name, ListHead fieldList) {

@@ -11,7 +11,7 @@ char* createName_sym() {
 	symVarCnt++;
 	char* name = (char*)malloc(sizeof(char) * 10);
 	if (name) sprintf(name, "v%d", symVarCnt);
-		return name;
+	return name;
 }
 
 char* createName_func() {

@@ -1130,7 +1130,6 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 			ILOP ilop = getAlgorithmOP(op);
 			InterCode code = createInterCode(getASTNodeStr_r(getASTNode(handler1)), getASTNodeStr_r(getASTNode(handler2)), getASTNodeStr_r(getASTNode(resHandler)), ilop);
 			appendInterCode(code);
-			printInterCode(code, NULL, NULL);
 		}
 	}
 	else if (node->expandNo == 9) {// LP Exp RP
@@ -1204,11 +1203,27 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		}	
 	}
 	else if (node->expandNo == 14) {// Exp LB Exp RB
+	printTables();
 		Node expNode1 = node->child[0];
 		Node expNode2 = node->child[2];
+		ASTNodeHandler handler1 = NULL;
+		ASTNodeHandler handler2 = NULL;
+		//printf("Cannot translate: Code contains variables or parameters of structure type.\n");
+		SM_Exp(expNode1, &handler1, NULL, NULL, 0, 0);
+		SM_Exp(expNode2, &handler2, NULL, NULL, 0, 0);
 
-		printf("Cannot translate: Code contains variables or parameters of structure type.\n");
-		//TODO:
+		Sym sym = getASTNode(handler1)->value.sym;
+
+		ASTNodeHandler refHandler = createASTNode_op(OP_REF, getASTNode(handler1), NULL);
+		ASTNodeHandler elemSizeHandler = createASTNode_integer(sym->type->u.array.elemType->size);
+		ASTNodeHandler offsetHandler = createASTNode_op(OP_STAR, getASTNode(handler2), getASTNode(elemSizeHandler));
+		ASTNodeHandler addHandler = createASTNode_op(OP_PLUS, getASTNode(refHandler), getASTNode(offsetHandler));
+		ASTNodeHandler resHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
+
+		getASTNode(handler2)->accessTag = 1;// 不需要再次输出计算过的东西
+		translateASTTree(getASTNode(resHandler));
+		
+		if (ret_handler)* ret_handler = resHandler;
 	}
 	else if (node->expandNo == 15) {// Exp DOT ID
 		Node expNode = node->child[0];

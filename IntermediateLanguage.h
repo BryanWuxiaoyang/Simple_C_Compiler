@@ -111,6 +111,7 @@ ListHead getInterCodeList() {
 
 void appendInterCode(InterCode code) {
 	MyList_pushElem(interCodeList, code);
+	printInterCode(code, NULL, NULL);
 }
 
 void insertInterCode(CodeIterator handlerIt, InterCode code) {

@@ -23,7 +23,7 @@ void translateASTTree(ASTNode node) {
 	case OP_MINUS:
 	case OP_STAR:
 	case OP_DIV: {
-		if (node->accessTag <= 1) {
+		if (node->accessTag <= 1 && isConstASTNode(node) == 0) {
 			translateASTTree(node->lc);
 			translateASTTree(node->rc);
 			appendInterCode(createInterCode(getASTNodeStr_l(node->lc), getASTNodeStr_r(node->rc), getASTNodeStr_r(node), getAlgorithmOP(node->value.op)));
