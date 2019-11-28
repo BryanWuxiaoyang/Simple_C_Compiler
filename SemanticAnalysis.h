@@ -1259,7 +1259,7 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		int offset = fieldSym->offset;
 		ASTNodeHandler offsetHandler = NULL;
 		ASTNodeHandler addHandler = NULL;
-		if (structSym->type->kind == ADDR) {
+		if (structSym->type->kind == ADDR && offset == 0) {
 			addHandler = refHandler;
 		}
 		else {
