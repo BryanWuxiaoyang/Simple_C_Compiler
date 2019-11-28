@@ -42,13 +42,13 @@ void addUniNode(UniNodeList* list, void* value){
 }
 
 struct SymChecker{
-    char symName[32];
+    const char symName[32];
     UniNodeList* assignTable;
     UniNodeList* useTable;
 };
 typedef struct SymChecker SymChecker;
 
-SymChecker* createSymChecker(char* name){
+SymChecker* createSymChecker(const char* name){
     SymChecker* newSymChecker=malloc(sizeof(SymChecker));
     strcpy(newSymChecker->symName,name);
     newSymChecker->assignTable=createUniNodeList();
@@ -75,12 +75,12 @@ int searchLine(SymChecker* sym,int lineno, TableType tableType){
     return INF;
 }
 
-int isSameSym(char* name,SymChecker* sym){
+int isSameSym(const char* name,SymChecker* sym){
     return strcmp(name,sym->symName)==0;
 }
 
 
-SymChecker* searchSymList(char* name,UniNodeList* list){
+SymChecker* searchSymList(const char* name,UniNodeList* list){
     for(UniNode* cur=list->head;cur!=list->rear;cur=cur->next)
         if(isSameSym(name,cur->value))
             return cur->value;
@@ -113,9 +113,9 @@ void processCode(InterCode code,int lineno,UniNodeList* symList){
     //装载各种引用表和赋值表 
     //注：没有处理标签
     //TODO：还缺少指针，标签以及引用
-    char* arg1 = code->arg1;
-	char* arg2 = code->arg2;
-	char* target = code->target;
+    const char* arg1 = code->arg1;
+	const char* arg2 = code->arg2;
+	const char* target = code->target;
     int *p=malloc(sizeof(int));
     *p=lineno;
     switch(code->op){
@@ -209,14 +209,14 @@ void processUselessCode(UniNodeList* symList,ListIterator it){
     while(MyList_hasNext(it)){
         InterCode code=(InterCode)MyList_getNext(it);
         InterCode curCode;
-         char* arg1 = code->arg1;
-	    char* arg2 = code->arg2;
-	    char* target = code->target;
-         int changeLineArg,changeLineTarget,changeLine;
-         int i;
-         SymChecker* arg1Sym;
-         SymChecker* targetSym;
-         ListIterator runIt=it;
+        const char* arg1 = code->arg1;
+	    const char* arg2 = code->arg2;
+	    const char* target = code->target;
+        int changeLineArg,changeLineTarget,changeLine;
+        int i;
+        SymChecker* arg1Sym;
+        SymChecker* targetSym;
+        ListIterator runIt=it;
         switch(code->op){
             case ILOP_ASSIGN:
                 targetSym=searchSymList(target,symList);
@@ -233,7 +233,7 @@ void processUselessCode(UniNodeList* symList,ListIterator it){
                     if(strcmp(curCode->arg2,target)==0)
                         strcpy(curCode->arg2,target);
                 }
-        }
+            }
         lineno++;
     }
 }
@@ -241,9 +241,9 @@ void processUselessCode(UniNodeList* symList,ListIterator it){
 void processUselessCode2(ListIterator it){
     while(MyList_hasNext(it)){
         InterCode code=(InterCode)MyList_getNext(it);
-	    char* target = code->target;
-        char* arg1=code->arg1;
-        if(code->op==ILOP_CALL||code->op==ILOP_PLUS||code->op==ILOP_MINUS||code->op==ILOP_MUL||code->op==ILOP_DIV){
+	    const char* target = code->target;
+        const char* arg1=code->arg1;
+        if(code->op==ILOP_CALL/*||code->op==ILOP_PLUS||code->op==ILOP_MINUS||code->op==ILOP_MUL||code->op==ILOP_DIV*/){
             InterCode nextCode=(InterCode)MyList_getNext(it);
             const char* nextArg1=nextCode->arg1;
             const char* nextTarget=nextCode->target;
@@ -255,8 +255,8 @@ void processUselessCode2(ListIterator it){
         if(code->op==ILOP_RETURN){
             MyList_getPrev(it);
             InterCode prevCode=(InterCode)MyList_getPrev(it);
-            char* prevArg1=prevCode->arg1;
-            char* prevTarget=prevCode->target;
+            const char* prevArg1=prevCode->arg1;
+            const char* prevTarget=prevCode->target;
             if(prevCode->op==ILOP_ASSIGN&&strcmp(target,prevTarget)==0){
                 strcpy(target,prevArg1);
                 MyList_removeNext(it);
@@ -281,7 +281,7 @@ UniNodeList* getCodeList(ListIterator it){
 
 void optimizeInterCodeLinear(){	
     ListIterator it = MyList_createIterator(interCodeList);
-    //UniNodeList* symList=getCodeList(it);
+    UniNodeList* symList=getCodeList(it);
     it=MyList_createIterator(interCodeList);
     //processUselessCode(symList,it);//处理情况2和3，过程中不会删除代码，只会修改，处理之后会产生一些无效的赋值或计算；但是这样没有考虑循环和分支，有不少问题
     processUselessCode2(it);
