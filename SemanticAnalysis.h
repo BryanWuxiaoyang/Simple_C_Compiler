@@ -809,6 +809,24 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 			appendInterCode(code1);
 		}
 
+#ifdef SUB_EXP_OPTMIZATION
+		// ���е��ⲿ�ӱ���ʽ������while������ʹ��
+		clearInnerASTNodes();
+#endif
+
+#ifdef VAR_CONST_OPTMIZATION
+		// ���з����������ⲿ����״̬��������while������ʹ��
+		AllASTNodeIterator it = createAllASTNodeIterator();
+		while (hasNextAllASTNode(it)) {
+			ASTNodeHandler handler = getNextAllASTNode(it);
+			if (isConstASTNode(getASTNode(handler)) && isInstantType(getASTNode(handler)->type) == 0) {
+				assignConstNone(&getASTNode(handler)->constValue);
+				clearParents(getASTNode(handler));
+			}
+		}
+		destroyAllASTNodeIterator(it);
+#endif
+
 		SM_Exp(expNode, &handler, trueList, nextList, 1, 0);
 
 		if (MyList_isEmpty(trueList) == 0) {
@@ -839,44 +857,25 @@ void SM_Stmt(Node node, Type returnType, ListHead nextList) {
 		else {
 			ListHead assignedHandlerList = MyList_createList();
 
-#ifdef SUB_EXP_OPTMIZATION
-			// ���е��ⲿ�ӱ���ʽ������while������ʹ��
-			clearInnerASTNodes();
-#endif
-
-#ifdef VAR_CONST_OPTMIZATION
-			// ���з����������ⲿ����״̬��������while������ʹ��
-			AllASTNodeIterator it = createAllASTNodeIterator();
-			while (hasNextAllASTNode(it)) {
-				ASTNodeHandler handler = getNextAllASTNode(it);
-				if (isConstASTNode(getASTNode(handler)) && isInstantType(getASTNode(handler)->type) == 0) {
-					assignConstNone(&getASTNode(handler)->constValue);
-					clearParents(getASTNode(handler));
-				}
-			}
-			destroyAllASTNodeIterator(it);
-#endif
-
 			pushInnerASTTable();
 			SM_Stmt(stmtNode, returnType, nextList);
 			popInnerASTTable();
 
-
-#ifdef VAR_CONST_OPTMIZATION
-			// ������while���������ɵĳ��������ܱ�ʹ��
-			it = createAllASTNodeIterator();
-			while (hasNextAllASTNode(it)) {
-				ASTNodeHandler handler = getNextAllASTNode(it);
-				if (isConstASTNode(getASTNode(handler)) && isInstantType(getASTNode(handler)->type) == 0) {
-					assignConstNone(&getASTNode(handler)->constValue);
-					clearParents(getASTNode(handler));
-				}
-			}
-			destroyAllASTNodeIterator(it);
-#endif
-
 			appendInterCode(createInterCode(NULL, NULL, label1, ILOP_GOTO));
 		}
+
+#ifdef VAR_CONST_OPTMIZATION
+		// ������while���������ɵĳ��������ܱ�ʹ��
+		it = createAllASTNodeIterator();
+		while (hasNextAllASTNode(it)) {
+			ASTNodeHandler handler = getNextAllASTNode(it);
+			if (isConstASTNode(getASTNode(handler)) && isInstantType(getASTNode(handler)->type) == 0) {
+				assignConstNone(&getASTNode(handler)->constValue);
+				clearParents(getASTNode(handler));
+			}
+		}
+		destroyAllASTNodeIterator(it);
+#endif
 	
 		MyList_destroyList(trueList);
 	}
