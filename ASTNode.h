@@ -1,6 +1,7 @@
 #pragma once
 #include <assert.h>
 #include "MyList.h"
+#include "Type.h"
 
 struct _ASTNodeHandler_;
 
@@ -32,6 +33,7 @@ struct _ASTNode_ {
 	enum ASTNodeType type;
 	union ASTNodeValue value;
 	char* name;
+	Type varType;
 
 	struct _ASTNode_* lc;
 	struct _ASTNode_* rc;
