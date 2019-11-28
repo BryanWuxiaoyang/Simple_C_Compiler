@@ -108,7 +108,7 @@ void printSymTable() {
 		ListIterator it2 = MyList_createIterator(table->head);
 		while (MyList_hasNext(it2)) {
 			Sym sym = (Sym)MyList_getNext(it2);
-			printf("\t\tsymbal %s, type: %s, offset: %d\n", sym->name, sym->type->name, sym->offset);
+			printf("\t\tsymbal %s, type: %s, type size: %d, offset: %d\n", sym->name, sym->type->name, sym->type->size, sym->offset);
 		}
 		MyList_destroyIterator(it2);
 	}
