@@ -393,12 +393,12 @@ int main(int argc,char** argv){
     }
     yyrestart(f);
     yyparse();
-    FILE* file = fopen("temp.txt","w");
+    //FILE* file = fopen("temp.txt","w");
     if(ok){
-        putSyntaxTreeToFile(file, nodeBuffer[0]);
-        fclose(file);
+        //putSyntaxTreeToFile(file, nodeBuffer[0]);
+        //fclose(file);
         semAnalysis(nodeBuffer[0]);
-        printInterCodeList(NULL,NULL);
+        //printInterCodeList(NULL,NULL);
         optimizeInterCodeLinear();
         printInterCodeList(NULL, NULL);
     }

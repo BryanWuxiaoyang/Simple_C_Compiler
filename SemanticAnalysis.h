@@ -59,7 +59,7 @@ struct _Node_ {
 };
 typedef struct _Node_* Node;
 
-#define TEST_MODE
+//#define TEST_MODE
 
 #ifdef TEST_MODE
 int indent = -1;
@@ -1204,7 +1204,6 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		}	
 	}
 	else if (node->expandNo == 14) {// Exp LB Exp RB
-	printTables();
 		Node expNode1 = node->child[0];
 		Node expNode2 = node->child[2];
 		ASTNodeHandler handler1 = NULL;
