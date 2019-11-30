@@ -35,14 +35,36 @@ void translateASTTree(ASTNode node) {
 	case OP_REF: {
 		if (node->accessTag <= 1) {
 			translateASTTree(node->lc);
-			//appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, getASTNodeStr_l(node), ILOP_ADDR));
+			if (node->lc->type == AST_OP && node->lc->value.op == OP_DEREF) {
+				node->name = getASTNodeStr_l(node->lc->lc);
+			}
+			else if (node->lc->type == AST_OP && node->lc->value.op == OP_REF) {
+				char* newName = createName_temp();
+				appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, newName, ILOP_ASSIGN));
+				node->name = newName;
+			}
+			else {
+
+			}
 		}
 		break;
 	}
 	case OP_DEREF: {
 		if (node->accessTag <= 1) {
 			translateASTTree(node->lc);
-			// do not need to print deref result, since the node itself can be directly used as the form '*v'
+			if (node->name[0] == '*') {
+				if (node->lc->type == AST_OP && node->lc->value.op == OP_REF) {
+					node->name = getASTNodeStr_l(node->lc->lc);
+				}
+				else if (node->lc->type == AST_OP && node->lc->value.op == OP_DEREF) {
+					char* newName = createName_temp();
+					appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, newName, ILOP_ASSIGN));
+					node->name = newName;
+				}
+				else {
+
+				}
+			}
 		}
 		break;
 	}

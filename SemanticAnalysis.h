@@ -1215,16 +1215,6 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		Type type = getASTNode(handler1)->varType;
 
 		ASTNodeHandler refHandler = createASTNode_op(OP_REF, getASTNode(handler1), NULL);
-		if (getASTNode(handler1)->type == AST_OP && (
-			(getASTNode(handler1)->value.op == OP_DEREF && getASTNodeStr_r(getASTNode(handler1))[0]=='*')|| 
-			(getASTNode(handler1)->value.op == OP_REF && getASTNodeStr_r(getASTNode(handler1))[0]=='&')
-			)
-			) {
-			char* newName = createName_temp();
-			appendInterCode(createInterCode(getASTNodeStr_r(getASTNode(handler1)), NULL, newName, ILOP_ASSIGN));
-			getASTNode(handler1)->name = newName;
-		}
-
 		ASTNodeHandler elemSizeHandler = createASTNode_integer(type->u.array.elemType->size);
 		ASTNodeHandler offsetHandler = createASTNode_op(OP_STAR, getASTNode(handler2), getASTNode(elemSizeHandler));
 		ASTNodeHandler addHandler = createASTNode_op(OP_PLUS, getASTNode(refHandler), getASTNode(offsetHandler));
@@ -1256,16 +1246,6 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 			structType = varType->u.targetType;
 		}
 		else if(varType->kind == STRUCTURE){
-			if (getASTNode(structSymHandler)->type == AST_OP && 
-				(
-					(getASTNode(structSymHandler)->value.op == OP_DEREF && getASTNodeStr_r(getASTNode(structSymHandler))[0] == '*')|| 
-					(getASTNode(structSymHandler)->value.op == OP_REF && getASTNodeStr_r(getASTNode(structSymHandler))[0] == '&')
-					)
-			){
-				char* newName = createName_temp();
-				appendInterCode(createInterCode(getASTNodeStr_r(getASTNode(structSymHandler)), NULL, newName, ILOP_ASSIGN));
-				getASTNode(structSymHandler)->name = newName;
-			}
 			refHandler = createASTNode_op(OP_REF, getASTNode(structSymHandler), NULL);
 			structType = varType;
 		}
@@ -1287,7 +1267,7 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		int offset = fieldSym->offset;
 		ASTNodeHandler offsetHandler = NULL;
 		ASTNodeHandler addHandler = NULL;
-		if (structType->kind == ADDR && offset == 0) {
+		if (offset == 0) {
 			addHandler = refHandler;
 		}
 		else {
