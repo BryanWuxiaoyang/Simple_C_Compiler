@@ -1,0 +1,40 @@
+int f(int i)
+{
+   return f(i-1);
+}
+int main()
+{
+    int i, j;
+    i=read();
+    j=f(i);
+    write(j);
+    return 0;
+}
+while(i<10)
+    {
+        while(j<9)
+        {
+            if(ar[j].a>ar[j+1].a)
+            {
+                int t=ar[j].a;
+                ar[j].a=ar[j+1].a;
+                ar[j+1].a=t;
+                t=ar[j].b;
+                ar[j].b=ar[j+1].b;
+                ar[j+1].b=t;
+            }
+            j=j+1;
+        }
+        i=i+1;
+        j=0;
+    }
+    i=0;
+
+    while(i<10)
+    {
+        ar[i].a=read();
+        ar[i].b=read();
+        i=i+1;
+    }
+    i=0;
+    

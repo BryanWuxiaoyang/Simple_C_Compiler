@@ -1237,19 +1237,20 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		Sym fieldSym = NULL;
 		Type varType = getASTNode(structSymHandler)->varType;
 		Type structType = NULL;
-		ASTNodeHandler refHandler = NULL;
+		ASTNode refNode = NULL;
 		
 		if (varType->kind == ADDR) {
-			refHandler = structSymHandler;
+			refNode = getASTNode(structSymHandler);
 			structType = varType->u.targetType;
 		}
 		else if(varType->kind == STRUCTURE){
 			if (getASTNode(structSymHandler)->type == AST_OP && getASTNode(structSymHandler)->value.op == OP_DEREF) {
-				char* newName = createName_temp();
-				appendInterCode(createInterCode(getASTNodeStr_r(getASTNode(structSymHandler)), NULL, newName, ILOP_ASSIGN));
-				getASTNode(structSymHandler)->name = newName;
+				refNode = getASTNode(structSymHandler)->lc;
 			}
-			refHandler = createASTNode_op(OP_REF, getASTNode(structSymHandler), NULL);
+			else {
+				ASTNodeHandler refHandler = createASTNode_op(OP_REF, getASTNode(structSymHandler), NULL);
+				refNode = getASTNode(refHandler);
+			}
 			structType = varType;
 		}
 		else {
@@ -1268,17 +1269,17 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 
 		if (fieldSym == NULL) assert(0);
 		int offset = fieldSym->offset;
-		ASTNodeHandler offsetHandler = NULL;
-		ASTNodeHandler addHandler = NULL;
+		ASTNode offsetNode = NULL;
+		ASTNode addNode = NULL;
 		if (structType->kind == ADDR && offset == 0) {
-			addHandler = refHandler;
+			addNode = refNode;
 		}
 		else {
-			offsetHandler = createASTNode_integer(offset);
-			addHandler = createASTNode_op(OP_PLUS, getASTNode(refHandler), getASTNode(offsetHandler));
+			offsetNode = getASTNode(createASTNode_integer(offset));
+			addNode = getASTNode(createASTNode_op(OP_PLUS, refNode, offsetNode));
 		}
 		
-		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
+		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, addNode, NULL);
 
 		translateASTTree(getASTNode(derefHandler));
 		if (ret_handler)* ret_handler = derefHandler;

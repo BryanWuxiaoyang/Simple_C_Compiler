@@ -1,0 +1,4 @@
+flex lexical.l
+bison syntax.y
+gcc syntax.tab.c -lfl -o parser -g
+./parser test.txt
