@@ -1219,8 +1219,8 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		ASTNodeHandler offsetHandler = createASTNode_op(OP_STAR, getASTNode(handler2), getASTNode(elemSizeHandler));
 		ASTNodeHandler addHandler = createASTNode_op(OP_PLUS, getASTNode(refHandler), getASTNode(offsetHandler));
 		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
-		if (getASTNode(derefHandler)->varType->kind == ARRAY) {
-			getASTNode(derefHandler)->varType = getASTNode(derefHandler)->varType->u.targetType;
+		if (getASTNode(derefHandler)->varType == type) {
+			getASTNode(derefHandler)->varType = getASTNode(derefHandler)->varType->u.array.elemType;
 		}
 
 		getASTNode(handler1)->accessTag = 1;
@@ -1276,7 +1276,9 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		}
 		
 		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
-		getASTNode(derefHandler)->varType = fieldSym->type;
+		if(getASTNode(derefHandler)->varType == structType){
+			getASTNode(derefHandler)->varType = fieldSym->type;
+		}
 
 		translateASTTree(getASTNode(derefHandler));
 		if (ret_handler)* ret_handler = derefHandler;

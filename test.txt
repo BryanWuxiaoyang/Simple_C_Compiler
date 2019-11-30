@@ -5,8 +5,10 @@ struct P
 };
 int main()
 {
-    struct P ar[10];
-    ar[0].a=0;
-    ar[0].b=0;
+    int a[2][2];
+    a[1];
+    a[1][1];
+    a[0][0] = 1;
+    a[1][1] = 2;
     return 0;
 }
