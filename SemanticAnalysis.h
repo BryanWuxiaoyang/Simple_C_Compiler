@@ -1276,6 +1276,7 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		}
 		
 		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
+		getASTNode(derefHandler)->varType = fieldSym->type;
 
 		translateASTTree(getASTNode(derefHandler));
 		if (ret_handler)* ret_handler = derefHandler;
@@ -1315,7 +1316,7 @@ void SM_Args(Node node, ListHead ret_handlerList) {
 		ASTNodeHandler handler = NULL;
 		SM_Exp(expNode, &handler, NULL, NULL, 0, 0);
 
-		if (getASTNode(handler)->value.sym->type->kind == STRUCTURE) {
+		if (getASTNode(handler)->varType->kind == STRUCTURE) {
 			clearParents(getASTNode(handler));
 			handler = createASTNode_op(OP_REF, getASTNode(handler), NULL);
 		}
@@ -1330,7 +1331,7 @@ void SM_Args(Node node, ListHead ret_handlerList) {
 		ASTNodeHandler handler = NULL;
 		SM_Exp(expNode, &handler, NULL, NULL, 0, 0);
 
-		if (getASTNode(handler)->type == AST_SYM && getASTNode(handler)->value.sym->type->kind == STRUCTURE) {
+		if (getASTNode(handler)->varType->kind == STRUCTURE) {
 			clearParents(getASTNode(handler));
 			handler = createASTNode_op(OP_REF, getASTNode(handler), NULL);
 		}
