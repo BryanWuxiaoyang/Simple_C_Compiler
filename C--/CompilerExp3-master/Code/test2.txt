@@ -1,7 +1,0 @@
-int main()
-{
-    int k,c,s,d;
-    k=c+s;
-    d=c+s+10;
-    return 0;
-}

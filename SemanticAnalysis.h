@@ -59,7 +59,7 @@ struct _Node_ {
 };
 typedef struct _Node_* Node;
 
-//#define TEST_MODE
+#define TEST_MODE
 
 #ifdef TEST_MODE
 int indent = -1;
@@ -1215,11 +1215,23 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 		Type type = getASTNode(handler1)->varType;
 
 		ASTNodeHandler refHandler = createASTNode_op(OP_REF, getASTNode(handler1), NULL);
+		if (getASTNode(handler1)->type == AST_OP && (
+			(getASTNode(handler1)->value.op == OP_DEREF && getASTNodeStr_r(getASTNode(handler1))[0]=='*')|| 
+			(getASTNode(handler1)->value.op == OP_REF && getASTNodeStr_r(getASTNode(handler1))[0]=='&')
+			)
+			) {
+			char* newName = createName_temp();
+			appendInterCode(createInterCode(getASTNodeStr_r(getASTNode(handler1)), NULL, newName, ILOP_ASSIGN));
+			getASTNode(handler1)->name = newName;
+		}
+
 		ASTNodeHandler elemSizeHandler = createASTNode_integer(type->u.array.elemType->size);
 		ASTNodeHandler offsetHandler = createASTNode_op(OP_STAR, getASTNode(handler2), getASTNode(elemSizeHandler));
 		ASTNodeHandler addHandler = createASTNode_op(OP_PLUS, getASTNode(refHandler), getASTNode(offsetHandler));
 		ASTNodeHandler derefHandler = createASTNode_op(OP_DEREF, getASTNode(addHandler), NULL);
-		getASTNode(derefHandler)->varType =  getASTNode(derefHandler)->varType->u.targetType;
+		if (getASTNode(derefHandler)->varType->kind == ARRAY) {
+			getASTNode(derefHandler)->varType = getASTNode(derefHandler)->varType->u.targetType;
+		}
 
 		getASTNode(handler1)->accessTag = 1;
 		getASTNode(handler2)->accessTag = 1;// 不需要再次输出计算过的东西
@@ -1244,7 +1256,12 @@ void SM_Exp(Node node, ASTNodeHandler* ret_handler, ListHead trueList, ListHead 
 			structType = varType->u.targetType;
 		}
 		else if(varType->kind == STRUCTURE){
-			if (getASTNode(structSymHandler)->type == AST_OP && getASTNode(structSymHandler)->value.op == OP_DEREF) {
+			if (getASTNode(structSymHandler)->type == AST_OP && 
+				(
+					(getASTNode(structSymHandler)->value.op == OP_DEREF && getASTNodeStr_r(getASTNode(structSymHandler))[0] == '*')|| 
+					(getASTNode(structSymHandler)->value.op == OP_REF && getASTNodeStr_r(getASTNode(structSymHandler))[0] == '&')
+					)
+			){
 				char* newName = createName_temp();
 				appendInterCode(createInterCode(getASTNodeStr_r(getASTNode(structSymHandler)), NULL, newName, ILOP_ASSIGN));
 				getASTNode(structSymHandler)->name = newName;
