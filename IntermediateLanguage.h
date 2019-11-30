@@ -29,7 +29,8 @@ enum ILOP {
 	ILOP_CALL,
 	ILOP_PARAM,
 	ILOP_READ,
-	ILOP_WRITE
+	ILOP_WRITE,
+	ILOP_DEREF
 };
 typedef enum ILOP ILOP;
 
@@ -182,6 +183,8 @@ void printInterCode(InterCode code, FILE* file, char* buffer) {
 	case 	ILOP_PARAM:		sprintf(buf, "PARAM %s", target); break;
 	case 	ILOP_READ:		sprintf(buf, "READ %s", target); break;
 	case 	ILOP_WRITE:		sprintf(buf, "WRITE %s", target); break;
+	case	ILOP_DEREF:		sprintf(buf, "%s := *%s", target, arg1); break;
+	default:				assert(0);
 	}
 
 	if (file) {

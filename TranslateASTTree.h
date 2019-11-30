@@ -38,9 +38,11 @@ void translateASTTree(ASTNode node) {
 			if (node->lc->type == AST_OP && node->lc->value.op == OP_DEREF) {
 				node->name = getASTNodeStr_l(node->lc->lc);
 			}
-			else if (node->lc->type == AST_OP && node->lc->value.op == OP_REF) {
+			else if (node->lc->type == AST_OP && node->lc->value.op == OP_REF && node->lc->name[0] == '&') {
+				char* temp = createName_temp();
 				char* newName = createName_temp();
-				appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, newName, ILOP_ASSIGN));
+				appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, temp, ILOP_ASSIGN));
+				appendInterCode(createInterCode(temp, NULL, newName, ILOP_ADDR));
 				node->name = newName;
 			}
 			else {
@@ -56,9 +58,11 @@ void translateASTTree(ASTNode node) {
 				if (node->lc->type == AST_OP && node->lc->value.op == OP_REF) {
 					node->name = getASTNodeStr_l(node->lc->lc);
 				}
-				else if (node->lc->type == AST_OP && node->lc->value.op == OP_DEREF) {
+				else if (node->lc->type == AST_OP && node->lc->value.op == OP_DEREF && node->lc->name[0] == '*') {
+					char* temp = createName_temp();
 					char* newName = createName_temp();
-					appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, newName, ILOP_ASSIGN));
+					appendInterCode(createInterCode(getASTNodeStr_r(node->lc), NULL, temp, ILOP_ASSIGN));
+					appendInterCode(createInterCode(temp, NULL, newName, ILOP_DEREF));
 					node->name = newName;
 				}
 				else {
