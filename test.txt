@@ -1,19 +1,12 @@
 struct P
 {
-    int a[2];
-    float b;
+    int a;
+    int b;
 };
-int func(struct P p){
-    p.a[0] = 1;
-    p.b = 1.1;
-    write(p.a[1]);
-}
 int main()
 {
     struct P ar[10];
-    ar[0].a[0]=0;
-    ar[0].a[1] = 1;
-    ar[0].b = 1.1;
-    ar[1].b = 2.2;
+    ar[0].a=0;
+    ar[0].b=0;
     return 0;
 }
